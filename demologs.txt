@@ -1,0 +1,13 @@
+ORIVIS V2 — Demo Accounts
+
+Platform Console (Admin):
+  Email:    kingpreshie07@gmail.com
+  Password: Precious112@
+  Role:     Super Admin — full platform access
+
+Organization Console (Workspace):
+  Email:                    Password:    Organization
+  ───────────────────────── ──────────── ─────────────────────────────────────
+  jessica.j@rsu.edu.ng      Demo@1234    Rivers State University Faculty of Engineering
+  admin@meranos.com         Demo@1234    Meranos Ltd.
+  voter@globaltech.io       Demo@1234    Global Tech Innovators Inc.

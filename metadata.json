@@ -1,0 +1,6 @@
+{
+  "name": "Orivis",
+  "description": "A highly polished, premium, and minimalist redesign of the Orivis Hero Section with a modern structural layout, bold condensed uppercase display typography, and off-white/charcoal tones.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

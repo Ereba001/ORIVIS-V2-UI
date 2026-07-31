@@ -1,0 +1,257 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Oswald", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  --font-console: "Montserrat", sans-serif;
+
+  --color-brand-bg: #070707;
+  --color-brand-bg-secondary: #0E0E0E;
+  --color-brand-surface: #141414;
+  --color-brand-surface-elevated: #1C1C1C;
+  --color-brand-surface-interactive: #262626;
+
+  --color-brand-gold: #FCA311;
+  --color-brand-gold-hover: #FFB938;
+  --color-brand-gold-pressed: #E08A00;
+  --color-brand-gold-disabled: #8A6A2E;
+
+  --color-brand-blue: #3B82F6;
+  --color-brand-blue-hover: #60A5FA;
+
+  --color-brand-text-primary: #FFFFFF;
+  --color-brand-text-secondary: #E8E8ED;
+  --color-brand-text-muted: #9C9CB0;
+  --color-brand-text-disabled: #6A6A80;
+
+  --color-brand-border: rgba(255, 255, 255, 0.1);
+  --color-brand-divider: rgba(255, 255, 255, 0.06);
+
+  --color-status-success: #22C55E;
+  --color-status-warning: #F59E0B;
+  --color-status-danger: #EF4444;
+  --color-status-info: #3B82F6;
+
+  --color-event-upcoming: #3B82F6;
+  --color-event-registration: #0EA5E9;
+  --color-event-live: #22C55E;
+  --color-event-counting: #FCA311;
+  --color-event-completed: #6B7280;
+  --color-event-cancelled: #EF4444;
+
+  --shadow-brand-sm: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --shadow-brand-md: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-brand-lg: 0 16px 40px rgba(0, 0, 0, 0.45);
+  --shadow-brand-gold: 0 0 24px rgba(252, 163, 17, 0.2);
+  --shadow-brand-blue: 0 0 24px rgba(59, 130, 246, 0.15);
+}
+
+:root {
+  --glass-bg: rgba(20, 20, 20, 0.65);
+  --glass-strong-bg: rgba(28, 28, 28, 0.85);
+  --glass-card-bg: rgba(20, 20, 20, 0.5);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-strong-border: rgba(255, 255, 255, 0.12);
+  --glass-card-border: rgba(255, 255, 255, 0.06);
+  --glass-card-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="light"] {
+  --color-brand-bg: #f2f1ef;
+  --color-brand-bg-secondary: #ededeb;
+  --color-brand-surface: #ffffff;
+  --color-brand-surface-elevated: #f8f7f5;
+  --color-brand-surface-interactive: #fbfbfa;
+
+  --color-brand-gold: #141414;
+  --color-brand-gold-hover: #333333;
+  --color-brand-gold-pressed: #000000;
+  --color-brand-gold-disabled: #999999;
+
+  --color-brand-blue: #3B82F6;
+  --color-brand-blue-hover: #60A5FA;
+
+  --color-brand-text-primary: #141414;
+  --color-brand-text-secondary: #333333;
+  --color-brand-text-muted: #555555;
+  --color-brand-text-disabled: #999999;
+
+  --color-brand-border: rgba(0, 0, 0, 0.14);
+  --color-brand-divider: rgba(0, 0, 0, 0.08);
+
+  --color-status-success: #22C55E;
+  --color-status-warning: #F59E0B;
+  --color-status-danger: #EF4444;
+  --color-status-info: #3B82F6;
+
+  --color-event-upcoming: #3B82F6;
+  --color-event-registration: #0EA5E9;
+  --color-event-live: #22C55E;
+  --color-event-counting: #FCA311;
+  --color-event-completed: #6B7280;
+  --color-event-cancelled: #EF4444;
+
+  --shadow-brand-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-brand-md: 0 8px 24px rgba(0, 0, 0, 0.1);
+  --shadow-brand-lg: 0 16px 40px rgba(0, 0, 0, 0.12);
+  --shadow-brand-gold: 0 0 24px rgba(0, 0, 0, 0.15);
+  --shadow-brand-blue: 0 0 24px rgba(59, 130, 246, 0.1);
+
+  --glass-bg: rgba(255, 255, 255, 0.75);
+  --glass-strong-bg: rgba(255, 255, 255, 0.9);
+  --glass-card-bg: rgba(255, 255, 255, 0.6);
+  --glass-border: rgba(0, 0, 0, 0.1);
+  --glass-strong-border: rgba(0, 0, 0, 0.16);
+  --glass-card-border: rgba(0, 0, 0, 0.08);
+  --glass-card-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+}
+
+@utility glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+}
+
+@utility glass-strong {
+  background: var(--glass-strong-bg);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid var(--glass-strong-border);
+}
+
+@utility glass-card {
+  background: var(--glass-card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-card-border);
+  box-shadow: var(--glass-card-shadow);
+}
+
+body {
+  font-family: var(--font-sans);
+  color: var(--color-brand-text-primary);
+  overflow-x: hidden;
+  background-color: var(--color-brand-bg);
+  transition: background-color 0.3s ease;
+  background-image:
+    radial-gradient(ellipse at 20% 25%, rgba(252, 163, 17, 0.06) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 75%, rgba(255, 255, 255, 0.015) 0%, transparent 50%),
+    repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(255, 255, 255, 0.005) 40px, rgba(255, 255, 255, 0.005) 41px),
+    repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(255, 255, 255, 0.005) 40px, rgba(255, 255, 255, 0.005) 41px),
+    linear-gradient(rgba(7, 7, 7, 0.55) 0%, rgba(7, 7, 7, 0.7) 100%),
+    url(./assets/images/bg-dark-wave.jpg);
+  background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px, 100% 100%, cover;
+  background-position: 0 0, 0 0, 0 0, 0 0, 0 0, center;
+  background-repeat: repeat, repeat, repeat, repeat, repeat, no-repeat;
+  background-attachment: fixed;
+}
+
+[data-theme="light"] body {
+  background-image:
+    radial-gradient(ellipse at 80% 75%, rgba(0, 0, 0, 0.015) 0%, transparent 50%),
+    repeating-linear-gradient(0deg, transparent, transparent 40px, rgba(0, 0, 0, 0.03) 40px, rgba(0, 0, 0, 0.03) 41px),
+    repeating-linear-gradient(90deg, transparent, transparent 40px, rgba(0, 0, 0, 0.03) 40px, rgba(0, 0, 0, 0.03) 41px);
+}
+
+.texture-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-blend-mode: overlay, normal;
+  background-size: cover, 100% 100%;
+  background-position: center;
+  mix-blend-mode: overlay;
+  transition: opacity 0.4s ease;
+}
+
+[data-theme="light"] .texture-layer {
+  opacity: 0.15 !important;
+}
+
+[data-theme="light"] button.bg-brand-gold,
+[data-theme="light"] a.bg-brand-gold {
+  background-color: #141414 !important;
+  color: #ffffff !important;
+}
+
+[data-theme="light"] .text-brand-gold {
+  color: #141414 !important;
+}
+[data-theme="light"] .orivis-logo {
+  filter: brightness(0) !important;
+}
+
+/* -- Platform Console specific tokens -- */
+:root {
+  --orivis-gold: #C9A227;
+  --orivis-gold-light: #E5C158;
+  --orivis-gold-dark: #A4801B;
+  --orivis-dark-bg: #050507;
+  --orivis-card-bg: #101012;
+  --orivis-input-bg: #161619;
+}
+
+.card-top-glow {
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.12),
+    0 0 1px 1px rgba(255, 255, 255, 0.05),
+    0 20px 50px -12px rgba(0, 0, 0, 0.95);
+}
+
+.glass-input {
+  background-color: rgba(16, 16, 18, 0.6);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+}
+
+.glass-input:focus {
+  border-color: var(--orivis-gold);
+  box-shadow: 
+    0 0 0 1px rgba(201, 162, 39, 0.3),
+    inset 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  outline: none;
+}
+
+.gold-glow {
+  box-shadow: 0 4px 20px 0 rgba(201, 162, 39, 0.25);
+}
+
+.gold-glow:hover {
+  box-shadow: 0 4px 25px 0 rgba(201, 162, 39, 0.4);
+}
+
+.text-orivis-gold { color: var(--orivis-gold); }
+.bg-orivis-gold { background-color: var(--orivis-gold); }
+.hover-bg-orivis-gold-light:hover { background-color: var(--orivis-gold-light); }
+.active-bg-orivis-gold-dark:active { background-color: var(--orivis-gold-dark); }
+.hover-text-orivis-gold-light:hover { color: var(--orivis-gold-light); }
+.border-orivis-gold { border-color: var(--orivis-gold); }
+
+.status-badge-default {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.6);
+}
+[data-theme="light"] .status-badge-default {
+  background-color: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.12);
+  color: rgba(0, 0, 0, 0.5);
+}
+
+button, .btn-like {
+  font-family: 'Montserrat', var(--font-sans);
+  transition: all 0.2s ease;
+}
+button:not(:disabled):hover, .btn-like:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+button:not(:disabled):active, .btn-like:not(:disabled):active {
+  transform: translateY(0);
+}
+
+
