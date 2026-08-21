@@ -522,6 +522,7 @@ function mapOrganization(raw: RawOrganization): OrganizationHealth {
     country: raw.country ?? '—',
     dateJoined: raw.created_at,
     workspaceStatus: workspaceStatus(raw.status),
+    assistedEventsEnabled: (raw as any).assisted_events_enabled ?? false,
   };
 }
 
@@ -1121,6 +1122,12 @@ export const platformService = {
     }
 
     return detail;
+  },
+
+  async toggleAssistedEvents(orgId: string, enabled: boolean): Promise<{ success: boolean; message: string; data: { assisted_events_enabled: boolean } }> {
+    const client = await getApiClient()
+    const { data } = await client.post(`/platform/organizations/${orgId}/toggle-assisted-events`, { enabled })
+    return unwrapPayload(data)
   },
 
   // --- Users ---

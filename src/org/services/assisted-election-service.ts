@@ -4,6 +4,14 @@ import { getApiClient, unwrapPayload } from '../../lib/api-client'
 // Types
 // ──────────────────────────────────────────────────────
 
+export interface EligibleEvent {
+    id: number
+    uuid: string
+    title: string
+    lifecycle_state: string
+    updated_at: string
+}
+
 export interface AssistedParticipant {
   id: number
   uuid: string
@@ -110,6 +118,12 @@ export interface ParticipantContextResult {
   elections: Array<ParticipantElection & {
     allowed_actions: string[]
     blocked_reasons: Record<string, string>
+    verification_methods?: Array<{
+      key: string
+      label: string
+      available: boolean
+      coming_soon?: boolean
+    }>
   }>
 }
 
@@ -320,5 +334,28 @@ export const assistedElectionService = {
   async logCenterAccess(): Promise<void> {
     const client = await getApiClient()
     await client.post('/assisted/center/access')
+  },
+
+  /** Get elections the current user is eligible to assist with. */
+  async getEligibleEvents(): Promise<Array<{id: number; uuid: string; title: string; lifecycle_state: string; updated_at: string}>> {
+    const client = await getApiClient()
+    const { data } = await client.get('/assisted/elections')
+    return unwrapPayload(data)
+  },
+
+  /** Bypass verification for a participant in an election. */
+  async bypassVerification(
+    electionId: string,
+    voterId: number,
+    reason: string,
+    targetAction: string,
+  ): Promise<{ success: boolean; message: string; bypass_reason: string }> {
+    const client = await getApiClient()
+    const { data } = await client.post(`/elections/${electionId}/assisted/bypass-verification`, {
+      voter_id: voterId,
+      reason,
+      target_action: targetAction,
+    })
+    return unwrapPayload(data)
   },
 }

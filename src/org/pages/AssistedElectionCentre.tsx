@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef, useMemo } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import {
   Search, Loader2, AlertCircle, X, Users, ClipboardCheck,
-  Vote, Key, Activity, Clock, RefreshCw,
+  Vote, Key, Activity, Clock, RefreshCw, Shield,
   ChevronLeft, ChevronRight as ChevronRightIcon, SearchX,
 } from 'lucide-react'
 import { useOrgBranding } from '../contexts/OrgBrandingContext'
@@ -22,7 +22,7 @@ import AssistedAuditModal from '../components/aec/AssistedAuditModal'
 import OperationProgressModal, { type OperationState } from '../components/OperationProgressModal'
 import EmptyState from '../components/EmptyState'
 
-type WorkflowView = 'search' | 'results' | 'participant' | 'action' | 'confirming' | 'processing' | 'success' | 'error'
+type WorkflowView = 'event_select' | 'search' | 'results' | 'participant' | 'action' | 'confirming' | 'processing' | 'success' | 'error'
 
 const ACTION_LABELS: Record<string, string> = {
   register: 'Register participant',
@@ -38,7 +38,7 @@ const ACTION_LABELS: Record<string, string> = {
 export default function AssistedElectionCentre() {
   const { branding } = useOrgBranding()
 
-  const [view, setView] = useState<WorkflowView>('search')
+  const [view, setView] = useState<WorkflowView>('event_select')
 
   const [searchQuery, setSearchQuery] = useState('')
   const [debouncedQuery, setDebouncedQuery] = useState('')
@@ -57,8 +57,8 @@ export default function AssistedElectionCentre() {
 
   const [operationState, setOperationState] = useState<OperationState>('idle')
   const [operationTitle, setOperationTitle] = useState('')
-  const [operationSuccessTitle, setOperationSuccessTitle] = useState('')
-  const [operationSuccessMessage, setOperationSuccessMessage] = useState('')
+  const [operationSuccessTitle] = useState('')
+  const [operationSuccessMessage] = useState('')
   const [operationErrorTitle, setOperationErrorTitle] = useState('')
   const [operationErrorMessage, setOperationErrorMessage] = useState('')
 
@@ -76,6 +76,12 @@ export default function AssistedElectionCentre() {
 
   const [centerStats, setCenterStats] = useState<{ total_participants: number; total_elections: number; registered: number; verified: number; active_passes: number; voted: number } | null>(null)
 
+  const [eligibleEvents, setEligibleEvents] = useState<Array<{id: number; uuid: string; title: string; lifecycle_state: string; updated_at: string}>>([])
+  const [loadingEvents, setLoadingEvents] = useState(false)
+  const [selectedEventForSearch, setSelectedEventForSearch] = useState<{id: number; title: string} | null>(null)
+  const [bypassReason, setBypassReason] = useState('')
+  const [bypassTarget, setBypassTarget] = useState('')
+
   const searchInputRef = useRef<HTMLInputElement>(null)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pageRef = useRef(1)
@@ -85,17 +91,22 @@ export default function AssistedElectionCentre() {
   useEffect(() => {
     let cancelled = false
     ;(async () => {
+      setLoadingEvents(true)
       try {
-        const [stats, activityResult] = await Promise.all([
+        const [stats, activityResult, events] = await Promise.all([
           assistedElectionService.getCenterStats(),
           assistedElectionService.getCenterActivity(20),
+          assistedElectionService.getEligibleEvents(),
         ])
         if (!cancelled) {
           setCenterStats(stats)
           setActivity(activityResult.data ?? [])
+          setEligibleEvents(events ?? [])
         }
       } catch {
         // Stats and activity load failed silently
+      } finally {
+        if (!cancelled) setLoadingEvents(false)
       }
     })()
     return () => { cancelled = true }
@@ -291,21 +302,55 @@ export default function AssistedElectionCentre() {
           break
         }
         case 'cast_vote': {
-          setView('processing')
-          setOperationTitle('Casting vote...')
-          setOperationState('processing')
-          setOperationSuccessTitle('Vote Cast Successfully')
-          setOperationSuccessMessage('The participant\'s vote has been recorded and encrypted.')
-          setSuccessTitle('Vote Cast')
-          setSuccessMessage('The participant\'s vote has been recorded and encrypted.')
+          setConfirmLoading(false)
+          setSuccessTitle('Use Voting Booth')
+          setSuccessMessage('Vote casting must be done through the voting booth. Start a voting session instead to generate a ballot for the participant.')
           setView('success')
-          break
+          return
         }
         case 'print_receipt': {
-          window.print()
-          setConfirmLoading(false)
-          setView('action')
+          setView('processing')
+          setOperationTitle('Loading receipt...')
+          setOperationState('processing')
+          try {
+            const ctx = participantContext
+            const election = ctx?.elections.find(e => e.election_id === selectedElectionId)
+            if (!election) throw new Error('No election context')
+            const receipt = await assistedElectionService.getReceipt(String(selectedElectionId), election.election_uuid)
+            setOperationState('success')
+            setSuccessTitle('Receipt Ready')
+            setSuccessMessage(`Receipt code: ${receipt.code}\nVerification URL: ${receipt.verification_url}`)
+            setView('success')
+            setTimeout(() => window.print(), 300)
+          } catch (err: unknown) {
+            const msg = err instanceof Error ? err.message : 'Failed to load receipt'
+            setOperationState('error')
+            setOperationErrorTitle('Receipt Error')
+            setOperationErrorMessage(msg)
+            setView('error')
+          }
           return
+        }
+        case 'bypass': {
+          if (!bypassReason.trim()) {
+            setError('A reason is required for privileged bypass.')
+            setView('error')
+            return
+          }
+          setView('processing')
+          setOperationTitle('Processing bypass...')
+          setOperationState('processing')
+          const result = await assistedElectionService.bypassVerification(
+            String(selectedElectionId),
+            selectedParticipant.id,
+            bypassReason,
+            bypassTarget,
+          )
+          setOperationState('success')
+          setSuccessTitle('Bypass Completed')
+          setSuccessMessage(result.message || `Verification bypassed. Reason: ${result.bypass_reason}`)
+          setView('success')
+          break
         }
         default:
           setConfirmLoading(false)
@@ -327,7 +372,7 @@ export default function AssistedElectionCentre() {
       setOperationErrorMessage(msg)
       setView('error')
     }
-  }, [selectedParticipant, selectedElectionId, currentAction, selectedElectionTitle, participantContext])
+  }, [selectedParticipant, selectedElectionId, currentAction, selectedElectionTitle, participantContext, bypassReason, bypassTarget])
 
   const goToParticipant = useCallback(() => {
     setView('participant')
@@ -344,7 +389,11 @@ export default function AssistedElectionCentre() {
   }, [])
 
   const goToSearch = useCallback(() => {
-    setView('search')
+    if (selectedEventForSearch) {
+      setView('search')
+    } else {
+      setView('event_select')
+    }
     setSelectedParticipant(null)
     setParticipantContext(null)
     setSelectedElectionId(null)
@@ -354,7 +403,7 @@ export default function AssistedElectionCentre() {
     setParticipants([])
     setPaginationMeta(null)
     searchInputRef.current?.focus()
-  }, [])
+  }, [selectedEventForSearch])
 
   const goToResults = useCallback(() => {
     setView('results')
@@ -395,9 +444,9 @@ export default function AssistedElectionCentre() {
     <div className="space-y-6 max-w-6xl mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-lg sm:text-xl font-bold text-brand-text-primary">Assisted Election Centre</h1>
+          <h1 className="text-lg sm:text-xl font-bold text-brand-text-primary">Assisted Events Centre</h1>
           <p className="text-xs text-brand-text-muted mt-0.5">
-            Search for a participant to assist them with elections, registration and voting.
+            Search for a participant to assist them with events, registration and voting.
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -417,6 +466,68 @@ export default function AssistedElectionCentre() {
       </div>
 
       <AnimatePresence mode="wait">
+        {view === 'event_select' && (
+          <motion.div
+            key="event_select"
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.2 }}
+            className="space-y-4"
+          >
+            <div className="flex flex-col items-center justify-center py-8 px-4">
+              <div className="w-full max-w-xl">
+                <div
+                  className="h-14 w-14 rounded-2xl flex items-center justify-center mx-auto mb-5"
+                  style={{ backgroundColor: `${PRIMARY}15`, color: PRIMARY }}
+                >
+                  <Vote size={24} />
+                </div>
+                <h2 className="text-base font-bold text-brand-text-primary text-center mb-1">Select an event</h2>
+                <p className="text-xs text-brand-text-muted text-center mb-6">
+                  Choose an event to assist participants with registration and voting.
+                </p>
+                {loadingEvents ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 size={20} className="animate-spin text-brand-text-muted" />
+                  </div>
+                ) : eligibleEvents.length > 0 ? (
+                  <div className="space-y-2">
+                    {eligibleEvents.map(ev => (
+                      <button
+                        key={ev.id}
+                        onClick={() => {
+                          setSelectedEventForSearch({ id: ev.id, title: ev.title })
+                          setView('search')
+                        }}
+                        className="w-full bg-brand-surface rounded-xl border border-brand-border p-4 text-left hover:border-brand-gold transition-all cursor-pointer group"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold text-brand-text-primary truncate group-hover:text-brand-gold transition-colors">{ev.title}</p>
+                            <p className="text-[10px] text-brand-text-muted mt-0.5">
+                              Updated {ev.updated_at ? new Date(ev.updated_at).toLocaleDateString() : ''}
+                            </p>
+                          </div>
+                          <span className="text-[9px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-full bg-brand-bg-secondary border border-brand-border text-brand-text-muted shrink-0">
+                            {ev.lifecycle_state}
+                          </span>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <EmptyState
+                    icon={Vote}
+                    title="No eligible events"
+                    description="There are no active or upcoming events you can assist with."
+                  />
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+
         {view === 'search' && (
           <motion.div
             key="search"
@@ -435,7 +546,7 @@ export default function AssistedElectionCentre() {
               </div>
               <h2 className="text-base font-bold text-brand-text-primary text-center mb-1">Find a participant</h2>
               <p className="text-xs text-brand-text-muted text-center mb-6">
-                Search by name, email, or voter ID across all elections.
+                Search by name, email, or voter ID across all events.
               </p>
               <div className="flex gap-2">
                 <div className="flex-1 relative">
@@ -611,7 +722,7 @@ export default function AssistedElectionCentre() {
                 <div className="bg-brand-surface rounded-xl border border-brand-border p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <ClipboardCheck size={14} className="text-brand-text-muted" />
-                    <h3 className="text-xs font-semibold text-brand-text-primary uppercase tracking-wider">Associated Elections</h3>
+                    <h3 className="text-xs font-semibold text-brand-text-primary uppercase tracking-wider">Associated Events</h3>
                   </div>
                   {filteredElections.length > 0 ? (
                     <div className="space-y-2">
@@ -627,8 +738,8 @@ export default function AssistedElectionCentre() {
                   ) : (
                     <EmptyState
                       icon={Vote}
-                      title="No eligible elections"
-                      description="This participant has no active or upcoming elections to assist with."
+                      title="No eligible events"
+                      description="This participant has no active or upcoming events to assist with."
                     />
                   )}
                 </div>
@@ -686,6 +797,19 @@ export default function AssistedElectionCentre() {
               >
                 <RefreshCw size={11} /> New search
               </button>
+              <button
+                onClick={() => {
+                  setBypassTarget('issue_and_verify')
+                  setBypassReason('')
+                  setConfirmTitle('Privileged Bypass')
+                  setConfirmDescription('You are about to bypass verification. A mandatory reason is required for audit purposes.')
+                  setConfirmLoading(false)
+                  setView('confirming')
+                }}
+                className="text-[10px] font-semibold text-amber-600 hover:text-amber-700 transition-colors cursor-pointer flex items-center gap-1 border border-amber-300 rounded-lg px-2 py-1"
+              >
+                <Shield size={11} /> Bypass Verification
+              </button>
             </div>
 
             <AnimatePresence>
@@ -727,6 +851,7 @@ export default function AssistedElectionCentre() {
                 blockedReasons={participantContext.elections.find(e => e.election_id === selectedElectionId)?.blocked_reasons ?? {}}
                 onAction={handleAction}
                 primaryColor={PRIMARY}
+                verificationMethods={participantContext.elections.find(e => e.election_id === selectedElectionId)?.verification_methods}
               />
             </div>
           </motion.div>
@@ -764,7 +889,7 @@ export default function AssistedElectionCentre() {
         )}
       </AnimatePresence>
 
-      {view !== 'search' && view !== 'results' && activity.length > 0 && (
+      {view !== 'event_select' && view !== 'search' && view !== 'results' && activity.length > 0 && (
         <div className="bg-brand-surface rounded-xl border border-brand-border overflow-hidden">
           <div className="px-4 py-3 border-b border-brand-divider flex items-center justify-between gap-4">
             <div className="flex items-center gap-2">

@@ -261,6 +261,40 @@ export default function OrganizationDetail() {
                 {org.workspaceStatus}
               </span>
             </div>
+
+            {/* Feature Flags */}
+            <div className="pt-3 border-t border-brand-border">
+              <h4 className="text-[9px] font-mono uppercase tracking-wider text-brand-text-muted font-bold mb-2">
+                Feature Flags
+              </h4>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-semibold text-brand-text-primary">Assisted Events Centre</p>
+                  <p className="text-[10px] text-brand-text-muted">Enable assisted voting and registration for this organization.</p>
+                </div>
+                <button
+                  onClick={async () => {
+                    try {
+                      const result = await platformService.toggleAssistedEvents(org.organizationId, !(org as any).assistedEventsEnabled)
+                      if (result.data) {
+                        reload()
+                      }
+                    } catch (err) {
+                      console.error('Failed to toggle AEC:', err)
+                    }
+                  }}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors cursor-pointer ${
+                    (org as any).assistedEventsEnabled ? 'bg-brand-gold' : 'bg-brand-surface-elevated'
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white transition-transform ${
+                      (org as any).assistedEventsEnabled ? 'translate-x-4.5' : 'translate-x-0.5'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Quick Info */}
@@ -275,6 +309,7 @@ export default function OrganizationDetail() {
               <QuickRow label="Admins" value={org.admins.toLocaleString()} />
               <QuickRow label="Active Events" value={org.activeEvents.toString()} />
               <QuickRow label="Storage" value={`${org.storageUsed} GB / ${org.storageTotal} GB`} />
+              <QuickRow label="AEC" value={(org as any).assistedEventsEnabled ? 'Enabled' : 'Disabled'} />
               <div className="w-full bg-brand-surface rounded-full h-1.5 overflow-hidden">
                 <div
                   className="h-full rounded-full bg-brand-gold transition-all"

@@ -249,6 +249,7 @@ export interface OrganizationHealth {
   country: string
   dateJoined: ISO8601DateTime
   workspaceStatus: 'healthy' | 'attention' | 'critical'
+  assistedEventsEnabled?: boolean
 }
 
 // --- Workspace Inspection Sessions ---
