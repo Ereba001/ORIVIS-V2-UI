@@ -1,0 +1,11 @@
+node_modules/
+build/
+dist/
+.git_disabled/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+demologs.txt
+.context-session.json

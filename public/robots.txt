@@ -1,0 +1,14 @@
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /contact
+Allow: /governance
+Allow: /privacy
+Allow: /terms
+
+Disallow: /signin
+Disallow: /signup
+Disallow: /dashboard
+Disallow: /api/
+
+Sitemap: https://orivis.com/sitemap.xml
