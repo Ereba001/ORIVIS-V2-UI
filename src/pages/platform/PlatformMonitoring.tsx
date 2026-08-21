@@ -67,6 +67,9 @@ export default function PlatformMonitoring() {
   }, [load])
 
   const services = health?.services
+  const allHealthy = services && Object.keys(services).length > 0
+    ? Object.values(services).every((s) => s?.healthy)
+    : false
 
   return (
     <>
@@ -121,7 +124,7 @@ export default function PlatformMonitoring() {
                   </div>
                   <div>
                     <div className="text-[10px] font-mono uppercase tracking-widest text-brand-text-muted">Platform Status</div>
-                    <div className="text-base font-bold uppercase tracking-wider text-brand-text-primary">Operational</div>
+                    <div className="text-base font-bold uppercase tracking-wider text-brand-text-primary">{allHealthy ? "All Systems Operational" : "Some Systems Degraded"}</div>
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-xs">
@@ -139,8 +142,8 @@ export default function PlatformMonitoring() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {(Object.keys(SERVICE_META) as ServiceKey[]).map((key) => {
-                const svc = services[key]
+              {(Object.keys(SERVICE_META) as ServiceKey[]).filter((key) => key in services).map((key) => {
+                const svc = services[key]!
                 const meta = SERVICE_META[key]
                 const state = statusOf(svc)
                 const Icon = meta.icon
@@ -193,7 +196,7 @@ export default function PlatformMonitoring() {
                           <dd className="font-mono text-brand-text-primary">{svc.connection}</dd>
                         </div>
                       )}
-                      {key === "scheduler" && (
+                      {key === "scheduler" && svc.lastTick && (
                         <div className="flex items-center justify-between gap-2">
                           <dt className="text-brand-text-muted">Last heartbeat</dt>
                           <dd className="font-mono text-brand-text-primary">{timeAgo(svc.lastTick)}</dd>

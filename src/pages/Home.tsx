@@ -469,11 +469,11 @@ export default function Home() {
                   id={`org-card-${idx}`}
                   onMouseEnter={() => setHoveredOrgIndex(idx)}
                   onTouchStart={() => setHoveredOrgIndex(idx)}
-                  className={`relative overflow-hidden bg-brand-bg-secondary border rounded-[24px] p-6 shadow-[0_16px_32px_rgba(0,0,0,0.4)] flex flex-col justify-between min-h-[350px] text-brand-text-primary transition-all duration-300 ease-out cursor-pointer ${
+                  className={`relative overflow-hidden bg-brand-bg-secondary border rounded-[24px] p-6 shadow-md flex flex-col justify-between min-h-[350px] text-brand-text-primary transition-all duration-300 ease-out cursor-pointer ${
                     isOtherCardHovered
                       ? "filter blur-[3px] opacity-30 scale-[0.95]"
                       : isHovered
-                        ? "scale-[1.05] border-brand-border bg-brand-surface shadow-[0_24px_48px_rgba(0,0,0,0.6)] z-20"
+                        ? "scale-[1.05] border-brand-border bg-brand-surface shadow-xl z-20"
                         : "border-brand-border opacity-100 scale-100"
                   }`}
                 >

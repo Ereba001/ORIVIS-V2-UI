@@ -14,7 +14,7 @@ export function AuthCard({ children, className = "" }: AuthCardProps) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-      className={`w-full max-w-md glass-card rounded-2xl p-8 shadow-[0_32px_64px_rgba(0,0,0,0.4)] ${className}`}
+      className={`w-full max-w-md glass-card rounded-2xl p-8 shadow-lg ${className}`}
     >
       {children}
     </motion.div>

@@ -220,6 +220,9 @@ export default function OrgRegistrationPage() {
           logoUrl: logoUrl ?? undefined,
           tagline: formData.tagline || undefined,
         });
+        if (!response?.accessToken) {
+          throw new Error('Registration succeeded but authentication failed. Please sign in.')
+        }
         authTokens.setTokens(response.accessToken);
         setStep("success");
       } catch (err) {

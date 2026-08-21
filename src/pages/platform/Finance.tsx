@@ -293,8 +293,8 @@ export default function Finance() {
                   label: "Status",
                   mobileOrder: 4,
                   render: (p: PlatformPayment) => (
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-mono uppercase tracking-wider font-bold ${STATUS_META[p.status].className}`}>
-                      {STATUS_META[p.status].label}
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-mono uppercase tracking-wider font-bold ${(STATUS_META[p.status] ?? STATUS_META.pending).className}`}>
+                      {(STATUS_META[p.status] ?? STATUS_META.pending).label}
                     </span>
                   ),
                 },

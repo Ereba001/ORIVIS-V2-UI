@@ -76,7 +76,7 @@ export default function VoterConsole() {
     const data = await electionService.getPublicElection(id)
     if (!data) return
     setElection(data)
-    const state = data.lifecycleState ?? data.status.toLowerCase()
+    const state = data.lifecycleState ?? data.status?.toLowerCase()
     if (state === "ended" || state === "archived") {
       setPhase("results")
     }
@@ -112,7 +112,7 @@ export default function VoterConsole() {
     try {
       const data = await electionService.getPublicElection(id)
       setElection(data)
-      const state = data?.lifecycleState ?? data?.status.toLowerCase()
+      const state = data?.lifecycleState ?? data?.status?.toLowerCase()
       if (state === "ended" || state === "archived") {
         setPhase("results")
       }
@@ -133,7 +133,7 @@ export default function VoterConsole() {
         const data = await electionService.getPublicElection(id!)
         if (cancelled) return
         setElection(data)
-        const state = data?.lifecycleState ?? data?.status.toLowerCase()
+        const state = data?.lifecycleState ?? data?.status?.toLowerCase()
         if (state === "ended" || state === "archived") {
           setPhase("results")
         }
@@ -274,7 +274,7 @@ export default function VoterConsole() {
   const b = branding.branding
   const orgName = branding.displayName
 
-  const lifecycle = election.lifecycleState ?? election.status.toLowerCase()
+  const lifecycle = election.lifecycleState ?? election.status?.toLowerCase()
   const votingOpen = lifecycle === "live" || lifecycle === "open"
   const registrationOpen = lifecycle === "published" || lifecycle === "live" || lifecycle === "paused"
   const votingEnded = lifecycle === "ended" || lifecycle === "archived"

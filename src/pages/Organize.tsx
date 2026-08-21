@@ -77,7 +77,7 @@ export default function Organize() {
       form,
       submittedAt: new Date().toISOString(),
     }
-    localStorage.setItem(`orivis_org_${appId}`, JSON.stringify(submission))
+    try { localStorage.setItem(`orivis_org_${appId}`, JSON.stringify(submission)) } catch (err) { console.warn('localStorage write failed:', err) }
     navigate("/org/signin")
   }
 
@@ -90,7 +90,7 @@ export default function Organize() {
       <div className="w-full flex-grow flex items-center justify-center py-12 px-4 sm:px-6 md:px-12 bg-gradient-to-br from-brand-bg via-brand-bg-secondary to-brand-bg min-h-[calc(100vh-80px)] mt-20 relative overflow-hidden">
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-white/[0.015] rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="w-full max-w-6xl glass-card rounded-[28px] overflow-hidden shadow-[0_32px_64px_rgba(0,0,0,0.4)] grid grid-cols-1 md:grid-cols-12 min-h-[600px] relative z-10">
+      <div className="w-full max-w-6xl glass-card rounded-[28px] overflow-hidden shadow-lg grid grid-cols-1 md:grid-cols-12 min-h-[600px] relative z-10">
         <TextureBg
           src="https://images.unsplash.com/photo-1765408217205-1c42d81f1677?q=80&w=1600&auto=format&fit=crop"
           opacity={0.15}

@@ -599,11 +599,11 @@ export default function PlatformStaff() {
                 label: "Department",
                 mobileOrder: 3,
                 render: (s: PlatformStaff) => {
-                  const DeptIcon = DEPT_ICONS[s.department]
+                  const DeptIcon = DEPT_ICONS[s.department] ?? Settings2
                   return (
                     <div className="flex items-center gap-2">
                       <DeptIcon size={12} className="text-brand-text-muted" />
-                      <span className="text-xs text-brand-text-muted">{DEPT_LABELS[s.department]}</span>
+                      <span className="text-xs text-brand-text-muted">{DEPT_LABELS[s.department] ?? s.department}</span>
                     </div>
                   )
                 },

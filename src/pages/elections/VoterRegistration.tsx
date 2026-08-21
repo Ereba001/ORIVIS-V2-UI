@@ -87,14 +87,18 @@ export default function VoterRegistration() {
 
   const handleLookup = useCallback(async (field: VoterLookupField, value: string) => {
     if (!id) return
-    const result = await electionService.lookupVoter(id, field, value)
-    setLookupResult(result)
-    if (regInfo?.registrationRequired) {
-      const reg = await electionService.register(id, field, value)
-      setRegistrationUuid(reg.registration)
-      setPageState("participant-preview")
-    } else {
-      setPageState("direct-complete")
+    try {
+      const result = await electionService.lookupVoter(id, field, value)
+      setLookupResult(result)
+      if (regInfo?.registrationRequired) {
+        const reg = await electionService.register(id, field, value)
+        setRegistrationUuid(reg.registration)
+        setPageState("participant-preview")
+      } else {
+        setPageState("direct-complete")
+      }
+    } catch (err) {
+      setPageState("error")
     }
   }, [id, regInfo])
 

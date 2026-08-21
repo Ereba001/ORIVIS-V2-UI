@@ -97,8 +97,8 @@ export default function OrgHelp() {
 
   const filteredArticles = HELP_ARTICLES.filter((a) =>
     !search || a.title.toLowerCase().includes(search.toLowerCase()) ||
-    a.description.toLowerCase().includes(search.toLowerCase()) ||
-    a.category.toLowerCase().includes(search.toLowerCase())
+    (a.description ?? '').toLowerCase().includes(search.toLowerCase()) ||
+    (a.category ?? '').toLowerCase().includes(search.toLowerCase())
   )
 
   const categories = Array.from(new Set(HELP_ARTICLES.map((a) => a.category)))

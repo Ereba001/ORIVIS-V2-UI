@@ -255,7 +255,7 @@ export default function PlatformLayout() {
           {!sidebarCollapsed && (
             <div className="px-3 py-2 mb-1">
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[9px] font-bold shrink-0" style={{ backgroundColor: 'var(--platform-accent)', color: 'var(--platform-accent)' === 'var(--platform-accent)' ? '#ffffff' : '#ffffff' }}>
+                <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[9px] font-bold shrink-0 text-white" style={{ backgroundColor: 'var(--platform-accent)' }}>
                   {adminInitials}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -266,7 +266,7 @@ export default function PlatformLayout() {
             </div>
           )}
           {sidebarCollapsed && (
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold mb-1" style={{ backgroundColor: 'var(--platform-accent)', color: '#ffffff' }}>
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold mb-1 text-white" style={{ backgroundColor: 'var(--platform-accent)' }}>
               {adminInitials}
             </div>
           )}
@@ -305,7 +305,7 @@ export default function PlatformLayout() {
               <SidebarNav location={location} navigate={navigate} collapsed={false} groups={navGroups} />
               <div className="p-4 border-t border-brand-divider space-y-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold" style={{ backgroundColor: 'var(--platform-accent)', color: '#ffffff' }}>
+                  <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-bold text-white" style={{ backgroundColor: 'var(--platform-accent)' }}>
                     {adminInitials}
                   </div>
                   <div>
@@ -415,7 +415,7 @@ export default function PlatformLayout() {
                 <button onClick={() => setProfileOpen(!profileOpen)}
                   className="h-9 w-9 flex items-center justify-center rounded-lg border border-brand-border text-brand-text-muted hover:bg-brand-surface-interactive hover:text-brand-text-secondary transition-colors"
                   aria-label="User menu" aria-expanded={profileOpen}>
-                  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold shrink-0" style={{ backgroundColor: 'var(--platform-accent)', color: '#ffffff' }}>
+                  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold shrink-0 text-white" style={{ backgroundColor: 'var(--platform-accent)' }}>
                     {adminInitials}
                   </div>
                 </button>

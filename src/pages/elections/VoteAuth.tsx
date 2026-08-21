@@ -54,6 +54,10 @@ export default function VoteAuth() {
     setError("")
   }, [])
 
+  if (!id) {
+    return <div className="text-center py-12 text-red-600">Invalid election.</div>
+  }
+
   const renderStatusCard = () => {
     if (authState === "valid") {
       return (

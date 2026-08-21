@@ -94,6 +94,10 @@ export default function VotingBooth() {
     }
   }, [token, urlToken, storedToken, id, navigate])
 
+  if (!id) {
+    return <div className="text-center py-12 text-red-600">Invalid election.</div>
+  }
+
   if (loading) {
     return (
       <div className="w-full flex-grow flex items-center justify-center pt-24">

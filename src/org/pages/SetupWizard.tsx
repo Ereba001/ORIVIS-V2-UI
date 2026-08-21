@@ -121,8 +121,8 @@ export default function SetupWizard() {
                     onClick={goNext}
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
-                    className="mt-8 inline-flex items-center gap-2 px-8 py-3 rounded-xl text-xs font-bold shadow-md"
-                    style={{ backgroundColor: branding.primaryColor, color: '#FFFFFF' }}
+                    className="mt-8 inline-flex items-center gap-2 px-8 py-3 rounded-xl text-xs font-bold shadow-md text-white"
+                    style={{ backgroundColor: branding.primaryColor }}
                   >
                     Get Started <ArrowRight size={13} />
                   </motion.button>
@@ -178,8 +178,8 @@ export default function SetupWizard() {
                   </button>
                   <motion.button type="button" onClick={goNext}
                     whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
-                    className="w-2/3 inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold shadow-md"
-                    style={{ backgroundColor: branding.primaryColor, color: '#FFFFFF' }}>
+                    className="w-2/3 inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold shadow-md text-white"
+                    style={{ backgroundColor: branding.primaryColor }}>
                     Looks Good <ArrowRight size={13} />
                   </motion.button>
                 </div>
@@ -218,8 +218,8 @@ export default function SetupWizard() {
                   </button>
                   <motion.button type="button" onClick={goNext}
                     whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
-                    className="w-2/3 inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold shadow-md"
-                    style={{ backgroundColor: branding.primaryColor, color: '#FFFFFF' }}>
+                    className="w-2/3 inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold shadow-md text-white"
+                    style={{ backgroundColor: branding.primaryColor }}>
                     Continue <ArrowRight size={13} />
                   </motion.button>
                 </div>
@@ -284,8 +284,8 @@ export default function SetupWizard() {
                   </button>
                   <motion.button type="button" onClick={goNext}
                     whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
-                    className="w-2/3 inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold shadow-md"
-                    style={{ backgroundColor: branding.primaryColor, color: '#FFFFFF' }}>
+                    className="w-2/3 inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold shadow-md text-white"
+                    style={{ backgroundColor: branding.primaryColor }}>
                     Continue <ArrowRight size={13} />
                   </motion.button>
                 </div>
@@ -346,8 +346,8 @@ export default function SetupWizard() {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
-                    className="mt-8 inline-flex items-center gap-2 px-8 py-3 rounded-xl text-xs font-bold shadow-md"
-                    style={{ backgroundColor: branding.primaryColor, color: '#FFFFFF' }}
+                    className="mt-8 inline-flex items-center gap-2 px-8 py-3 rounded-xl text-xs font-bold shadow-md text-white"
+                    style={{ backgroundColor: branding.primaryColor }}
                   >
                     Go to Dashboard <LayoutDashboard size={13} />
                   </motion.button>

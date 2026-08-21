@@ -675,8 +675,8 @@ export default function OrgLayout() {
                   <img src={branding.logoUrl} alt={`${branding.organizationName} logo`} className="h-6 w-auto"
                     onError={(e) => { e.currentTarget.style.display = 'none'; const fb = e.currentTarget.nextElementSibling as HTMLElement | null; if (fb) fb.style.display = 'flex' }} />
                 ) : null}
-                <div className="w-8 h-8 rounded-xl items-center justify-center text-xs font-bold shrink-0"
-                  style={{ backgroundColor: branding.primaryColor, color: '#FFFFFF', display: branding.logoUrl ? 'none' : 'flex' }}>
+                <div className="w-8 h-8 rounded-xl items-center justify-center text-xs font-bold shrink-0 text-white"
+                  style={{ backgroundColor: branding.primaryColor, display: branding.logoUrl ? 'none' : 'flex' }}>
                   {branding.shortName.charAt(0)}
                 </div>
                 <div>

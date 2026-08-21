@@ -175,7 +175,7 @@ export default function PlatformDashboard() {
           <div className="relative flex flex-col gap-5 p-5 sm:p-6 lg:p-7">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="flex items-start gap-3 sm:gap-4 min-w-0">
-                <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl flex items-center justify-center text-[10px] font-bold shrink-0" style={{ backgroundColor: 'var(--org-primary)', color: '#FFFFFF' }}>
+                <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl flex items-center justify-center text-[10px] font-bold shrink-0 text-white" style={{ backgroundColor: 'var(--org-primary)' }}>
                   ORIVIS
                 </div>
                 <div className="min-w-0">

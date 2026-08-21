@@ -72,7 +72,7 @@ export default function InvitationAcceptPage() {
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="w-full max-w-md"
           >
-            <div className="glass-card rounded-2xl p-10 shadow-[0_32px_64px_rgba(0,0,0,0.4)]">
+            <div className="glass-card rounded-2xl p-10 shadow-lg">
               <div className="text-center mb-4">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-mono font-medium status-badge-default">
                   <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
@@ -109,7 +109,7 @@ export default function InvitationAcceptPage() {
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="w-full max-w-md"
           >
-            <div className="glass-card rounded-2xl p-10 shadow-[0_32px_64px_rgba(0,0,0,0.4)]">
+            <div className="glass-card rounded-2xl p-10 shadow-lg">
               <div className="text-center mb-4">
                 <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-mono font-medium status-badge-default">
                   <span className="w-1.5 h-1.5 rounded-full bg-current" />
@@ -333,7 +333,7 @@ export default function InvitationAcceptPage() {
             transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             className="w-full max-w-md"
           >
-            <div className="glass-card rounded-2xl p-10 shadow-[0_32px_64px_rgba(0,0,0,0.4)]">
+            <div className="glass-card rounded-2xl p-10 shadow-lg">
               {formContent}
             </div>
           </motion.div>

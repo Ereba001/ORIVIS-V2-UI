@@ -44,23 +44,6 @@ export default function Analytics() {
         <p className="text-sm text-brand-text-muted mt-1">Platform wide analytics and insights.</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {STATS.map((stat, i) => {
-          const Icon = stat.icon
-          return (
-            <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
-              className="bg-brand-surface border border-brand-border rounded-2xl p-5">
-              <div className={`w-10 h-10 rounded-xl bg-brand-surface-elevated flex items-center justify-center ${stat.color} mb-3`}>
-                <Icon size={20} />
-              </div>
-              <p className="text-2xl font-bold font-mono text-brand-text-primary">{stat.value}</p>
-              <p className="text-xs text-brand-text-muted mt-1">{stat.label}</p>
-              <p className="text-[10px] font-mono mt-1 text-brand-text-muted/60">{stat.change}</p>
-            </motion.div>
-          )
-        })}
-      </div>
-
       {loading && (
         <div className="space-y-2">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -81,6 +64,23 @@ export default function Analytics() {
 
       {!loading && !error && (
       <>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {STATS.map((stat, i) => {
+          const Icon = stat.icon
+          return (
+            <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+              className="bg-brand-surface border border-brand-border rounded-2xl p-5">
+              <div className={`w-10 h-10 rounded-xl bg-brand-surface-elevated flex items-center justify-center ${stat.color} mb-3`}>
+                <Icon size={20} />
+              </div>
+              <p className="text-2xl font-bold font-mono text-brand-text-primary">{stat.value}</p>
+              <p className="text-xs text-brand-text-muted mt-1">{stat.label}</p>
+              <p className="text-[10px] font-mono mt-1 text-brand-text-muted/60">{stat.change}</p>
+            </motion.div>
+          )
+        })}
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-brand-surface border border-brand-border rounded-2xl p-6">
           <div className="flex items-center justify-between mb-4">

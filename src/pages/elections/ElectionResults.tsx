@@ -14,23 +14,31 @@ export default function ElectionResults() {
   const [election, setElection] = useState<Election | null>(null)
   const [resultsData, setResultsData] = useState<ElectionResultsData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
 
   async function loadResults(electionId: string) {
-    const e = await electionService.getPublicElection(electionId)
-    if (!e) { setLoading(false); return }
-    setElection(e)
+    setLoading(true)
+    setError(null)
+    try {
+      const e = await electionService.getPublicElection(electionId)
+      if (!e) { setLoading(false); return }
+      setElection(e)
 
-    // Results are only ever read from the published-gated public results
-    // endpoint. No authenticated endpoint is used as a fallback, so live
-    // tallies can never leak onto the public results page during voting.
-    const slug = (e as { slug?: string }).slug
-    if (slug) {
-      const publicResults = await resultsService.getPublicResults(slug)
-      if (publicResults && publicResults.positions.length > 0) {
-        setResultsData(publicResults)
+      // Results are only ever read from the published-gated public results
+      // endpoint. No authenticated endpoint is used as a fallback, so live
+      // tallies can never leak onto the public results page during voting.
+      const slug = (e as { slug?: string }).slug
+      if (slug) {
+        const publicResults = await resultsService.getPublicResults(slug)
+        if (publicResults && publicResults.positions.length > 0) {
+          setResultsData(publicResults)
+        }
       }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load results.")
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
   useEffect(() => {
@@ -41,6 +49,14 @@ export default function ElectionResults() {
     return (
       <div className="w-full flex-grow flex items-center justify-center pt-24">
         <Loader2 size={20} className="animate-spin text-brand-gold" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="w-full flex-grow flex items-center justify-center pt-24 px-6">
+        <p className="text-xs text-status-error">{error}</p>
       </div>
     )
   }

@@ -22,14 +22,20 @@ export default function VoteSuccess() {
 
   useEffect(() => {
     if (!receiptUuid || !id) { setLoading(false); return }
+    let cancelled = false
     Promise.all([
       voterService.getReceiptByUuid(id, receiptUuid),
       electionService.getPublicElection(id),
     ]).then(([r, e]) => {
-      setReceipt(r)
-      setElection(e)
-      setLoading(false)
-    }).catch(() => setLoading(false))
+      if (!cancelled) {
+        setReceipt(r)
+        setElection(e)
+        setLoading(false)
+      }
+    }).catch(() => {
+      if (!cancelled) setLoading(false)
+    })
+    return () => { cancelled = true }
   }, [receiptUuid, id])
 
   if (loading) {

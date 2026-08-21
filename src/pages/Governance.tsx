@@ -88,7 +88,7 @@ export default function Governance() {
       const e = await electionService.getPublicElections()
       setElections(e)
       setError(null)
-    } catch { /* keep last list */ }
+    } catch (err) { console.warn('Governance.poll:', err) }
   }, 30000)
 
   return (

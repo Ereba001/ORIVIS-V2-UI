@@ -188,7 +188,7 @@ export default function OrgBilling() {
     </>)
   }
 
-  const { summary } = data
+  const { summary } = data?.summary ? data : { summary: { total_billed: 0, total_paid: 0, pending_amount: 0, total_events: 0, currency: 'NGN' } }
   const summaryCards = [
     { label: 'Total Billed', value: formatMoney(summary.total_billed, summary.currency), icon: CreditCard, color: pColor },
     { label: 'Total Paid', value: formatMoney(summary.total_paid, summary.currency), icon: CheckCircle2, color: '#22C55E' },
@@ -261,7 +261,7 @@ export default function OrgBilling() {
                       <p className='text-[9px] text-brand-text-muted mt-0.5'>{new Date(ev.created_at).toLocaleDateString()}</p>
                     </td>
                     <td className='py-3 pr-3'><span className='text-[10px] text-brand-text-secondary font-medium'>{ev.tier_name ?? (ev.is_free ? 'Free' : '\u2014')}</span></td>
-                    <td className='py-3 pr-3 text-xs font-bold text-brand-text-primary text-right whitespace-nowrap'>{ev.participant_count.toLocaleString()}</td>
+                    <td className='py-3 pr-3 text-xs font-bold text-brand-text-primary text-right whitespace-nowrap'>{ev.participant_count?.toLocaleString() ?? '0'}</td>
                     <td className='py-3 pr-3 text-xs font-bold text-brand-text-primary text-right whitespace-nowrap'>{formatMoney(ev.amount, ev.currency)}</td>
                     <td className='py-3 pr-3 text-xs font-bold text-right whitespace-nowrap' style={{ color: isPaid ? '#22C55E' : '#F59E0B' }}>{formatMoney(ev.paid_amount, ev.currency)}</td>
                     <td className='py-3 pr-3 text-right'>

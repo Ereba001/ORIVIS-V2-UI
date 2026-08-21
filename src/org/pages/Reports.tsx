@@ -138,8 +138,9 @@ export default function OrgReports() {
     setGenerating(true)
     try {
       await orgService.downloadReport(reportKey)
-    } catch {
-      // export failed silently
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : 'Export failed.'
+      alert(msg)
     } finally {
       setGenerating(false)
     }

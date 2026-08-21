@@ -89,16 +89,21 @@ export default function OrgTeam() {
   const [bulkRemoveTarget, setBulkRemoveTarget] = useState(false)
 
   const { data, loading, error, reload } = useApiResource(async () => {
-    const [team, invitations, roles, permissions, subscription] = await Promise.all([
+    const [teamResult, invitationsResult, rolesResult, permissionsResult, subscriptionResult] = await Promise.allSettled([
       orgService.getTeam({ perPage: 100 }),
       orgService.getInvitations(),
       orgService.getRoles(),
       orgService.getPermissions(),
       orgService.getSubscriptionInfo(),
     ])
-    const rolesWithCounts = roles.map((r) => ({
+    const team = teamResult.status === 'fulfilled' ? teamResult.value : { items: [] as Array<{ id: string; displayName: string; email: string; role: string; status: string; department: string; lastActive: string }> }
+    const invitations = invitationsResult.status === 'fulfilled' ? invitationsResult.value : []
+    const roles = rolesResult.status === 'fulfilled' ? rolesResult.value : []
+    const permissions = permissionsResult.status === 'fulfilled' ? permissionsResult.value : []
+    const subscription = subscriptionResult.status === 'fulfilled' ? subscriptionResult.value : null
+    const rolesWithCounts = roles.map((r: Role) => ({
       ...r,
-      memberCount: team.items.filter((m) => m.role === r.name).length,
+      memberCount: team.items.filter((m: { role: string }) => m.role === r.name).length,
     }))
     return { team, invitations, roles: rolesWithCounts, permissions, subscription }
   })
@@ -200,7 +205,8 @@ export default function OrgTeam() {
   const otherInvitations = filteredInvitations.filter((i) => i.status !== 'pending')
 
   const customRolesUsed = CUSTOM_ROLES.length
-  const customRoleLimit = SUBSCRIPTION.seatsTotal
+  const seatsTotal = SUBSCRIPTION?.seatsTotal ?? 0
+  const customRoleLimit = seatsTotal
 
   // --- Handlers ---
 
@@ -514,7 +520,7 @@ export default function OrgTeam() {
                             <p className="text-[8px] text-brand-text-muted mt-0.5">{member.department}</p>
                           </td>
                           <td className="px-3 py-3">
-                            <span className={`text-[9px] px-2 py-0.5 rounded-full border ${STATUS_STYLES[member.status]}`}>
+                            <span className={`text-[9px] px-2 py-0.5 rounded-full border ${(STATUS_STYLES as Record<string, string>)[member.status] ?? STATUS_STYLES.active}`}>
                               {member.status}
                             </span>
                           </td>

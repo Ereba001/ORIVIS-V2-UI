@@ -25,7 +25,10 @@ export default function SignInPage() {
       {isAuthenticated && showForm && (
         <div className="fixed top-4 right-4 z-50">
           <button
-            onClick={async () => { await logout(); setShowForm(false); }}
+            onClick={async () => {
+              try { await logout() } catch (err) { console.error('Logout failed:', err) }
+              setShowForm(false)
+            }}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-brand-surface border border-brand-border text-brand-text-muted text-[10px] font-mono uppercase tracking-wider hover:text-brand-text-primary hover:border-brand-gold transition-all cursor-pointer"
           >
             <LogOut size={12} /> Sign in as different user

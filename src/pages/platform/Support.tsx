@@ -222,7 +222,7 @@ export default function PlatformSupportCentre() {
           setSelectedTicket(updated)
           setTickets((prev) => prev.map((t) => t.id === selectedTicket.id ? updated : t))
         }
-      } catch { /* ignore */ }
+      } catch (err) { console.error('Support.poll:', err) }
     }, 10000)
     return () => clearInterval(interval)
   }, [selectedTicket?.id])
@@ -293,7 +293,9 @@ export default function PlatformSupportCentre() {
       await platformService.replyToTicket(selectedTicket.id, text || (pendingMedia?.type === 'voice' ? '' : text), false, media)
       setPendingMedia(null)
       await reloadTicket(selectedTicket.id)
-    } catch { /* ignore */ }
+    } catch (err) {
+      setMutationError(err instanceof Error ? err.message : 'Failed to send reply.')
+    }
     finally { setSendingReply(false) }
   }
 

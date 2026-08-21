@@ -184,7 +184,7 @@ export default function SignIn({ onSuccess, variant, compact }: SignInProps) {
         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
         className="w-full max-w-md"
       >
-        <div className="glass-card rounded-2xl p-6 sm:p-10 shadow-[0_32px_64px_rgba(0,0,0,0.4)]">
+        <div className="glass-card rounded-2xl p-6 sm:p-10 shadow-lg">
           {formContent}
         </div>
       </motion.div>

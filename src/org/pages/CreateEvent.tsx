@@ -1188,8 +1188,8 @@ export default function CreateEvent() {
                   onClick={() => goTo(4)}
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
-                  className="w-2/3 inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold shadow-md"
-                  style={{ backgroundColor: branding.primaryColor, color: '#FFFFFF' }}
+                  className="w-2/3 inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold shadow-md text-white"
+                  style={{ backgroundColor: branding.primaryColor }}
                 >
                   Review Event
                   <ArrowRight size={13} />
@@ -1322,8 +1322,8 @@ export default function CreateEvent() {
                   onClick={handleCreate}
                   whileHover={{ scale: 1.01 }}
                   whileTap={{ scale: 0.99 }}
-                  className="w-2/3 inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold shadow-md"
-                  style={{ backgroundColor: branding.primaryColor, color: '#FFFFFF' }}
+                  className="w-2/3 inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold shadow-md text-white"
+                  style={{ backgroundColor: branding.primaryColor }}
                 >
                   Create Event
                 </motion.button>

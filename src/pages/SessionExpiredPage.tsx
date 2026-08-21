@@ -19,7 +19,7 @@ export default function SessionExpiredPage() {
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className="relative z-10 w-full max-w-md"
       >
-        <div className="glass-card rounded-2xl p-8 md:p-10 shadow-[0_32px_64px_rgba(0,0,0,0.4)] text-center">
+        <div className="glass-card rounded-2xl p-8 md:p-10 shadow-lg text-center">
           <div className="flex items-center justify-center mb-6">
             <OrivisLogo className="text-brand-text-primary" />
           </div>

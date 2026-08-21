@@ -233,17 +233,9 @@ export default function UserDetail() {
           </div>
           <div className="bg-brand-surface-elevated rounded-xl p-4">
             <h3 className="text-[10px] font-mono uppercase tracking-wider text-brand-text-muted font-bold mb-3">Recent Activity</h3>
-            {[
-              { action: "Logged in from Lagos, Nigeria", time: "2h ago" },
-              { action: "Created election 'Board of Directors'", time: "1d ago" },
-              { action: "Updated organization branding", time: "3d ago" },
-            ].map((act, i) => (
-              <div key={i} className="flex items-center gap-2 py-1.5">
-                <Activity size={10} className="text-brand-text-muted" />
-                <span className="text-xs text-brand-text-primary">{act.action}</span>
-                <span className="text-[9px] font-mono text-brand-text-muted ml-auto">{act.time}</span>
-              </div>
-            ))}
+            <div className="flex items-center gap-2 text-xs text-brand-text-muted py-1.5">
+              No recent activity recorded.
+            </div>
           </div>
         </div>
       </div>

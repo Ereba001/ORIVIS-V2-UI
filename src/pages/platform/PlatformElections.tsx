@@ -19,11 +19,11 @@ export default function PlatformElections() {
   const [actionError, setActionError] = useState<string | null>(null)
   const { data, loading, error, reload } = useApiResource(() => platformService.getElections())
 
-  const elections = data ?? []
+  const elections = Array.isArray(data) ? data : []
 
   const filtered = elections.filter((e) => {
     if (!search && tab === "all") return true
-    const matchesSearch = !search || e.name.toLowerCase().includes(search.toLowerCase()) || e.org.toLowerCase().includes(search.toLowerCase())
+    const matchesSearch = !search || e.name.toLowerCase().includes(search.toLowerCase()) || e.org?.toLowerCase().includes(search.toLowerCase())
     const statusKey = e.status === "Pending Review" ? "pending" : e.status.toLowerCase() as string
     const matchesTab = tab === "all" || statusKey === tab
     return matchesSearch && matchesTab

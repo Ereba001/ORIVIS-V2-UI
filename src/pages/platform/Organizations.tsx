@@ -71,10 +71,10 @@ export default function PlatformOrganizations() {
       const q = search.toLowerCase()
       result = result.filter(
         (o) =>
-          o.organizationName.toLowerCase().includes(q) ||
-          o.slug.toLowerCase().includes(q) ||
-          o.country.toLowerCase().includes(q) ||
-          o.plan.toLowerCase().includes(q)
+          o.organizationName?.toLowerCase().includes(q) ||
+          o.slug?.toLowerCase().includes(q) ||
+          o.country?.toLowerCase().includes(q) ||
+          o.plan?.toLowerCase().includes(q)
       )
     }
 

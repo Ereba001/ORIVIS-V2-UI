@@ -275,8 +275,8 @@ export default function OrgEvents() {
             onClick={() => navigate('/org/events/create')}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
-            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all w-full sm:w-auto"
-            style={{ backgroundColor: branding.primaryColor, color: '#FFFFFF' }}
+            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all w-full sm:w-auto text-white"
+            style={{ backgroundColor: branding.primaryColor }}
           >
             <Plus size={14} />
             Create Event

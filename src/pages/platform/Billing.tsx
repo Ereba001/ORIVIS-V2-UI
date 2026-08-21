@@ -22,7 +22,9 @@ export default function Billing() {
   const orgs = overview?.organizations
   const elections = overview?.elections
   const payments = overview?.payments
-  const revenueEntries = overview ? Object.entries(overview.revenue.byCurrency) : []
+  const revenueEntries = overview?.revenue?.byCurrency
+    ? Object.entries(overview.revenue.byCurrency)
+    : []
   const totalRevenue = revenueEntries.reduce((sum, [, v]) => sum + v, 0)
 
   const orgSegments = [

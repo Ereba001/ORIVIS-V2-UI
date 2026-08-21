@@ -186,8 +186,8 @@ export default function OrgDashboard() {
                 />
               ) : (
                 <div
-                  className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl flex items-center justify-center text-base font-bold shrink-0"
-                  style={{ backgroundColor: 'var(--org-primary)', color: '#FFFFFF' }}
+                  className="h-11 w-11 sm:h-12 sm:w-12 rounded-xl flex items-center justify-center text-base font-bold shrink-0 text-white"
+                  style={{ backgroundColor: 'var(--org-primary)' }}
                 >
                   {branding.shortName.charAt(0)}
                 </div>
