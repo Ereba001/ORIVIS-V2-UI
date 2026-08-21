@@ -6,6 +6,6 @@ coverage/
 .DS_Store
 *.log
 .env*
-!.env.example
+
 demologs.txt
 .context-session.json
