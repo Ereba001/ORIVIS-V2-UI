@@ -14,6 +14,7 @@ export interface OrgBrandingConfig {
   organizationType: string
   organizationContext: string
   electionCategories: string[]
+  organizationStatus?: 'active' | 'suspended' | 'closed'
 }
 
 export interface OrgUser {

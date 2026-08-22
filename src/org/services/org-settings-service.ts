@@ -98,4 +98,8 @@ export const orgSettingsService = {
     )
     return unwrapPayload<{ faviconUrl: string }>(data).faviconUrl
   },
+
+  async closeWorkspace(password: string, confirmation: string): Promise<void> {
+    await getApiClient().post(API.ENDPOINTS.WORKSPACE.CLOSE, { password, confirmation })
+  },
 }

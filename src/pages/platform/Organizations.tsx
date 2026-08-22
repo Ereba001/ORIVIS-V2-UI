@@ -158,9 +158,16 @@ export default function PlatformOrganizations() {
                     <div className="w-8 h-8 rounded-lg bg-brand-surface-elevated flex items-center justify-center shrink-0">
                       <Building2 size={14} className="text-brand-text-muted" />
                     </div>
-                    <span className="text-xs font-semibold text-brand-text-primary whitespace-nowrap">
-                      {org.organizationName}
-                    </span>
+                    <div className="min-w-0">
+                      <span className="text-xs font-semibold text-brand-text-primary whitespace-nowrap block">
+                        {org.organizationName}
+                      </span>
+                      {org.orivisId && (
+                        <span className="text-[9px] font-mono text-brand-text-muted block">
+                          {org.orivisId}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 ),
               },

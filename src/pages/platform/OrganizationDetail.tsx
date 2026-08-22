@@ -7,7 +7,7 @@ import {
   FileText, Mail, Phone, MapPin, CreditCard, Clock, RefreshCw,
   CheckCircle2, AlertTriangle, XCircle, MessageSquare,
   Receipt, LifeBuoy, ScrollText, StickyNote, DollarSign,
-  PauseCircle, PlayCircle, ExternalLink,
+  PauseCircle, PlayCircle, ExternalLink, Loader2,
 } from "lucide-react"
 import Breadcrumbs from "../../components/platform/Breadcrumbs"
 import TabNav from "../../components/platform/TabNav"
@@ -18,6 +18,8 @@ import ResponsiveTable, { ResponsiveColumn } from "../../components/platform/Res
 import WorkspaceAccessDialog from "../../components/platform/WorkspaceAccessDialog"
 import { platformService, mapSubscription } from "../../services/platform-service"
 import { useApiResource } from "../../hooks/useApiResource"
+import { getApiClient } from "../../lib/api-client"
+import { API } from "../../constants/api"
 import type {
   OrganizationHealth,
   SubscriptionRecord,
@@ -117,6 +119,32 @@ export default function OrganizationDetail() {
   }, [showWorkspaceModal])
 
   const org = useMemo<OrganizationHealth | undefined>(() => data?.organization, [data])
+
+  const [pricingTiers, setPricingTiers] = useState<Array<{ id: number; name: string; code: string }>>([])
+  const [assigningTier, setAssigningTier] = useState(false)
+  const [toast, setToast] = useState<{ type: "success" | "error"; message: string } | null>(null)
+  const [acting, setActing] = useState(false)
+
+  useEffect(() => {
+    getApiClient().get(API.ENDPOINTS.PLATFORM.PRICING_TIERS, { params: { per_page: 100, is_active: 1 } })
+      .then(({ data: res }) => setPricingTiers(res?.data ?? []))
+      .catch(() => {})
+  }, [])
+
+  const handleAssignPricingTier = async (tierId: number | null) => {
+    if (!org?.organizationId) return
+    setAssigningTier(true)
+    try {
+      await getApiClient().put(API.ENDPOINTS.ORGANIZATIONS.ASSIGN_PRICING_TIER(org.organizationId), {
+        pricing_tier_id: tierId,
+      })
+      reload()
+    } catch (err) {
+      console.error("Failed to assign pricing tier:", err)
+    } finally {
+      setAssigningTier(false)
+    }
+  }
 
   const subscription = useMemo<SubscriptionRecord | undefined>(() => {
     if (!data?.subscription) return undefined
@@ -295,6 +323,30 @@ export default function OrganizationDetail() {
                 </button>
               </div>
             </div>
+
+            {/* Custom Pricing Tier */}
+            <div className="pt-3 border-t border-brand-border">
+              <h4 className="text-[9px] font-mono uppercase tracking-wider text-brand-text-muted font-bold mb-2">
+                Custom Pricing Tier
+              </h4>
+              <p className="text-[10px] text-brand-text-muted mb-3">
+                Assign a custom pricing tier to override the default per event pricing for this organization.
+              </p>
+              <div className="flex items-center gap-2">
+                <select
+                  value={(org as any).customPricingTierId ?? ''}
+                  onChange={(e) => handleAssignPricingTier(e.target.value ? Number(e.target.value) : null)}
+                  disabled={assigningTier}
+                  className="flex-1 bg-brand-bg-secondary/50 border border-brand-divider rounded-xl px-3 py-2 text-[10px] text-brand-text-primary focus:outline-none transition-all"
+                >
+                  <option value="">Default (no override)</option>
+                  {pricingTiers.map((tier) => (
+                    <option key={tier.id} value={tier.id}>{tier.name} ({tier.code})</option>
+                  ))}
+                </select>
+                {assigningTier && <Loader2 size={12} className="animate-spin text-brand-text-muted" />}
+              </div>
+            </div>
           </div>
 
           {/* Quick Info */}
@@ -310,6 +362,12 @@ export default function OrganizationDetail() {
               <QuickRow label="Active Events" value={org.activeEvents.toString()} />
               <QuickRow label="Storage" value={`${org.storageUsed} GB / ${org.storageTotal} GB`} />
               <QuickRow label="AEC" value={(org as any).assistedEventsEnabled ? 'Enabled' : 'Disabled'} />
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-brand-text-muted">Custom Pricing</span>
+                <span className="text-[10px] font-semibold text-brand-text-primary">
+                  {(org as any).customPricingTierId ? 'Custom' : 'Default'}
+                </span>
+              </div>
               <div className="w-full bg-brand-surface rounded-full h-1.5 overflow-hidden">
                 <div
                   className="h-full rounded-full bg-brand-gold transition-all"

@@ -233,6 +233,7 @@ export interface PlatformUser {
 export interface OrganizationHealth {
   organizationId: UUID
   organizationName: string
+  orivisId?: string
   slug: string
   logoUrl: string | null
   email: string | null
@@ -278,6 +279,7 @@ export interface WorkspaceView {
   organization: {
     uuid: UUID
     name: string
+    orivis_id?: string
     slug: string
     email: string
     phone: string | null
@@ -438,5 +440,260 @@ export interface PlatformSystemHealth {
     cache: SystemServiceHealth
     scheduler: SystemServiceHealth
     queue: SystemServiceHealth
+  }
+}
+
+// ── Security Operations Center ──
+
+export type SecurityEventSeverity = 'INFO' | 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL'
+export type SecurityClassification = 'NORMAL' | 'SUSPICIOUS' | 'MALICIOUS' | 'BLOCKED'
+export type IncidentStatus = 'OPEN' | 'INVESTIGATING' | 'CONTAINED' | 'RESOLVED' | 'FALSE_POSITIVE'
+export type AlertStatus = 'OPEN' | 'ACKNOWLEDGED' | 'RESOLVED' | 'FALSE_POSITIVE'
+
+export interface SecurityEvent {
+  id: number
+  uuid: UUID
+  organization_id: number | null
+  organization_name?: string
+  organization_orivis_id?: string
+  user_id: number | null
+  user_name?: string
+  event_type: string
+  severity: SecurityEventSeverity
+  classification: SecurityClassification
+  actor_type: string | null
+  actor_id: string | null
+  actor_role: string | null
+  source: string
+  ip_address: string | null
+  user_agent: string | null
+  service: string | null
+  endpoint: string | null
+  http_method: string | null
+  action: string | null
+  target_type: string | null
+  target_id: string | null
+  result: string
+  http_status: number | null
+  description: string | null
+  risk_score: number
+  risk_factors: Array<{ reason: string; contribution: number }> | null
+  detection_rule: string | null
+  response_action: string | null
+  response_detail: string | null
+  correlation_id: string | null
+  request_id: string | null
+  incident_id: number | null
+  count: number
+  window_seconds: number | null
+  event_time: ISO8601DateTime | null
+  created_at: ISO8601DateTime
+  updated_at: ISO8601DateTime
+}
+
+export interface SecurityIncident {
+  id: number
+  uuid: UUID
+  organization_id: number | null
+  organization?: { id: number; uuid: UUID; name: string; orivis_id: string; slug: string; status: string } | null
+  severity: SecurityEventSeverity
+  status: IncidentStatus
+  risk_score: number
+  risk_factors: Array<{ reason: string; contribution: number }> | null
+  detection_rules: string[] | null
+  event_count: number
+  title: string | null
+  description: string | null
+  source_ip: string | null
+  source_type: string | null
+  auto_response: string | null
+  auto_response_detail: string | null
+  auto_responded_at: ISO8601DateTime | null
+  investigation_notes: string | null
+  investigated_at: ISO8601DateTime | null
+  resolved_at: ISO8601DateTime | null
+  contained_at: ISO8601DateTime | null
+  first_detected_at: ISO8601DateTime | null
+  last_detected_at: ISO8601DateTime | null
+  affected_resources: unknown[] | null
+  events?: SecurityEvent[]
+  alerts?: SecurityAlert[]
+  created_at: ISO8601DateTime
+  updated_at: ISO8601DateTime
+}
+
+export interface SecurityIncidentTimeline {
+  id: number
+  incident_id: number
+  security_event_id: number | null
+  event_type: string
+  severity: SecurityEventSeverity
+  action: string
+  detail: string | null
+  actor: string | null
+  source: string | null
+  event_time: ISO8601DateTime
+  created_at: ISO8601DateTime
+}
+
+export interface SecurityAlert {
+  id: number
+  uuid: UUID
+  incident_id: number | null
+  organization_id: number | null
+  organization?: { id: number; uuid: UUID; name: string; orivis_id: string; slug: string; status: string } | null
+  severity: SecurityEventSeverity
+  status: AlertStatus
+  title: string
+  description: string | null
+  data: Record<string, unknown> | null
+  source: string
+  detection_rule: string | null
+  count: number
+  dedupe_key: string | null
+  correlation_id: string | null
+  delivered_in_app: boolean
+  delivered_email: boolean
+  delivered_webhook: boolean
+  acknowledged_at: ISO8601DateTime | null
+  resolved_at: ISO8601DateTime | null
+  resolution_note: string | null
+  created_at: ISO8601DateTime
+  updated_at: ISO8601DateTime
+}
+
+export interface SecurityDashboardSummary {
+  system_status: string
+  security_status: string
+  active_incidents: number
+  critical_alerts: number
+  suspended_organizations: number
+  suspicious_sources: number
+  actions_per_second: number
+  total_events_1h: number
+  failed_actions: number
+  blocked_actions: number
+  suspicious_actions: number
+  active_organizations: number
+  active_ips: number
+  severity_counts: Record<string, number>
+  category_counts: Record<string, number>
+}
+
+export interface SecurityRealtimeSummary {
+  total_events: number
+  total_failed: number
+  total_blocked: number
+  total_suspicious: number
+  actions_per_second: number
+  max_actions_per_minute: number
+  min_actions_per_minute: number
+  avg_actions_per_minute: number
+  active_organizations: number
+  active_ips: number
+  severity_counts: Record<string, number>
+  category_counts: Record<string, number>
+  window_minutes: number
+}
+
+export interface SecurityActivityGraph {
+  buckets: Array<{ time: string; timestamp: number; count: number }>
+  total: number
+  period_minutes: number
+  metric: string
+}
+
+export interface SecurityTelemetryHealth {
+  status: 'LIVE' | 'RECONNECTING' | 'DEGRADED' | 'OFFLINE'
+  last_event_at: ISO8601DateTime | null
+  last_event_age_seconds: number | null
+  events_last_5min: number
+}
+
+export interface OrganizationRequiringAttention {
+  organization: {
+    id: number
+    uuid: UUID
+    name: string
+    orivis_id: string
+    slug: string
+    status: string
+  }
+  risk_score: number
+  event_count: number
+  latest_event_type: string | null
+  latest_event_time: ISO8601DateTime | null
+  open_incidents: number
+}
+
+// --- Telemetry Metrics ---
+export interface TelemetryMetric {
+  metric_name: string
+  value: number
+  tags: Record<string, unknown> | null
+  recorded_at: string
+}
+
+export interface TelemetrySummary {
+  avg: number
+  max: number
+  min: number
+  data_points: number
+}
+
+export interface HealthIncident {
+  id: number
+  service: string
+  severity: 'info' | 'warning' | 'critical'
+  title: string
+  description: string | null
+  status: 'open' | 'investigating' | 'resolved'
+  started_at: string
+  resolved_at: string | null
+  metadata: Record<string, unknown> | null
+}
+
+export interface DependencyNode {
+  name: string
+  type: 'database' | 'cache' | 'queue' | 'scheduler' | 'external'
+  dependencies: string[]
+  description: string
+}
+
+export interface DependencyMap {
+  services: DependencyNode[]
+}
+
+// --- Enhanced System Health ---
+export interface EnhancedSystemHealth extends PlatformSystemHealth {
+  php: {
+    version: string
+    memory_limit: string
+    max_execution_time: number
+    upload_max_filesize: string
+    post_max_size: string
+  }
+  services: {
+    database: SystemServiceHealth & { latencyMs?: number; tables?: number; totalRows?: number }
+    cache: SystemServiceHealth & { latencyMs?: number }
+    scheduler: SystemServiceHealth & { ageSeconds?: number }
+    queue: SystemServiceHealth & { recentFailures?: Array<{ id: number; queue: string; error: string; failedAt: string }> }
+    memory: {
+      healthy: boolean | null
+      usageBytes?: number
+      peakBytes?: number
+      limitBytes?: number
+      usagePercent?: number
+      usageFormatted?: string
+      peakFormatted?: string
+      limitFormatted?: string
+      message?: string
+      error?: string
+    }
+    external: {
+      paystack?: { healthy: boolean | null; latencyMs?: number; error?: string; message?: string }
+      brevo?: { healthy: boolean | null; latencyMs?: number; error?: string; message?: string }
+      cloudinary?: { healthy: boolean | null; latencyMs?: number; error?: string; message?: string }
+    }
   }
 }

@@ -75,6 +75,7 @@ const DEFAULT_BRANDING: OrgBrandingConfig = {
   organizationType: 'ORGANIZATION',
   organizationContext: '',
   electionCategories: [],
+  organizationStatus: 'active',
 }
 
 function setFavicon(url: string | null, primaryColor: string) {
@@ -107,6 +108,7 @@ export function OrgBrandingProvider({ children }: { children: ReactNode }) {
   const [serverOrgType, setServerOrgType] = useState<string | null>(null)
   const [serverOrgContext, setServerOrgContext] = useState<string | null>(null)
   const [serverElectionCategories, setServerElectionCategories] = useState<string[]>([])
+  const [serverOrgStatus, setServerOrgStatus] = useState<'active' | 'suspended' | 'closed' | null>(null)
   const overrideRef = useRef<Partial<OrgBrandingConfig> | null>(null)
   const requestSeq = useRef(0)
   const [retryTick, setRetryTick] = useState(0)
@@ -137,10 +139,12 @@ export function OrgBrandingProvider({ children }: { children: ReactNode }) {
           organizationType?: string
           organizationContext?: string
           electionCategories?: string[]
+          status?: string
         }>(data)
         if (profile?.organizationType) setServerOrgType(profile.organizationType.toUpperCase())
         if (profile?.organizationContext) setServerOrgContext(profile.organizationContext)
         if (Array.isArray(profile?.electionCategories)) setServerElectionCategories(profile.electionCategories)
+        if (profile?.status) setServerOrgStatus(profile.status as 'active' | 'suspended' | 'closed')
       })
       .catch((err) => { console.error('OrgBranding.fetchOrgProfile:', err) })
 
@@ -176,6 +180,7 @@ export function OrgBrandingProvider({ children }: { children: ReactNode }) {
     if (serverOrgType) base.organizationType = serverOrgType
     if (serverOrgContext) base.organizationContext = serverOrgContext
     if (serverElectionCategories.length > 0) base.electionCategories = serverElectionCategories
+    if (serverOrgStatus) base.organizationStatus = serverOrgStatus
     if (serverBranding?.organizationName) {
       const name = serverBranding.organizationName
       const shortName =

@@ -18,6 +18,7 @@ import NotificationBell from '../../components/NotificationBell'
 import NotificationToasts from '../../components/NotificationToasts'
 import WorkspaceSuspended from '../components/WorkspaceSuspended'
 import WorkspaceClosed from '../components/WorkspaceClosed'
+import WorkspaceImpersonationBanner from '../../components/platform/WorkspaceImpersonationBanner'
 
 const QUICK_ACTIONS = [
   { id: 'qa-1', label: 'Create Event', description: 'Set up a new election, poll or survey', href: '/org/events/create' },
@@ -124,6 +125,7 @@ export default function OrgLayout() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [profileOpen, setProfileOpen] = useState(false)
   const [quickActionsOpen, setQuickActionsOpen] = useState(false)
+  const [bannerExiting, setBannerExiting] = useState(false)
   const headerControlsRef = useRef<HTMLDivElement>(null)
 
   const [isDesktop, setIsDesktop] = useState<boolean>(() => window.matchMedia('(min-width: 1024px)').matches)
@@ -218,6 +220,20 @@ export default function OrgLayout() {
   return (
     <div className="org-shell min-h-screen bg-brand-bg flex" data-org-theme={orgTheme}>
       <NotificationToasts toasts={notificationToasts} onDismiss={dismissToast} />
+
+      <AnimatePresence>
+        {(isInspection || intervention.isActive) && (
+          <WorkspaceImpersonationBanner
+            organizationName={branding.organizationName}
+            mode={isIntervention ? 'full_control' : 'view_only'}
+            onExit={() => {
+              setBannerExiting(true)
+              exitInspection()
+            }}
+            exiting={bannerExiting}
+          />
+        )}
+      </AnimatePresence>
       <style>{`
         :root {
           --org-primary: ${branding.primaryColor};

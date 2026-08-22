@@ -26,6 +26,10 @@ import type {
   WorkspaceSession,
   WorkspaceSessionMode,
   WorkspaceView,
+  TelemetryMetric,
+  TelemetrySummary,
+  HealthIncident,
+  DependencyMap,
 } from '../types/platform';
 
 function timeAgo(value: string): string {
@@ -88,6 +92,7 @@ interface RawOrgWithPivot extends RawOrganization {
 interface RawOrganization {
   id: number;
   uuid: string;
+  orivis_id?: string;
   name: string;
   slug: string;
   registration_number: string | null;
@@ -506,6 +511,7 @@ function mapOrganization(raw: RawOrganization): OrganizationHealth {
   return {
     organizationId: raw.uuid,
     organizationName: raw.name,
+    orivisId: raw.orivis_id,
     slug: raw.slug,
     logoUrl: raw.logo_url,
     status: orgHealthStatus(raw.status),
@@ -1031,6 +1037,31 @@ export const platformService = {
   async getMonitoringHealth(): Promise<PlatformSystemHealth> {
     const { data } = await getApiClient().get<unknown>(API.ENDPOINTS.PLATFORM.MONITORING_HEALTH);
     return unwrapPayload<PlatformSystemHealth>(data);
+  },
+
+  async getMonitoringMetrics(category: string, hours: number = 24): Promise<TelemetryMetric[]> {
+    const { data } = await getApiClient().get<unknown>(`${API.ENDPOINTS.PLATFORM.MONITORING_METRICS}?category=${encodeURIComponent(category)}&hours=${hours}`);
+    return unwrapPayload<TelemetryMetric[]>(data);
+  },
+
+  async getMonitoringSummary(hours: number = 24): Promise<Record<string, TelemetrySummary>> {
+    const { data } = await getApiClient().get<unknown>(`${API.ENDPOINTS.PLATFORM.MONITORING_SUMMARY}?hours=${hours}`);
+    return unwrapPayload<Record<string, TelemetrySummary>>(data);
+  },
+
+  async getMonitoringIncidents(limit: number = 20): Promise<HealthIncident[]> {
+    const { data } = await getApiClient().get<unknown>(`${API.ENDPOINTS.PLATFORM.MONITORING_INCIDENTS}?limit=${limit}`);
+    return unwrapPayload<HealthIncident[]>(data);
+  },
+
+  async getMonitoringDependencies(): Promise<DependencyMap> {
+    const { data } = await getApiClient().get<unknown>(API.ENDPOINTS.PLATFORM.MONITORING_DEPENDENCIES);
+    return unwrapPayload<DependencyMap>(data);
+  },
+
+  async triggerTelemetryCollection(): Promise<{ collected: number; recorded_at: string }> {
+    const { data } = await getApiClient().post<unknown>(API.ENDPOINTS.PLATFORM.MONITORING_COLLECT);
+    return unwrapPayload<{ collected: number; recorded_at: string }>(data);
   },
 
   // --- Billing overview (legacy monthly model) ---

@@ -160,6 +160,7 @@ export default function WorkspaceView() {
                 </div>
                 <div className="flex items-center gap-2 text-[10px] font-mono text-brand-text-muted">
                   {org && <span>{org.slug}</span>}
+                  {org?.orivis_id && <><span className="w-1 h-1 rounded-full bg-brand-text-disabled" /><span>{org.orivis_id}</span></>}
                   {org && <span className="w-1 h-1 rounded-full bg-brand-text-disabled" />}
                   <span>
                     {sessionActive && session

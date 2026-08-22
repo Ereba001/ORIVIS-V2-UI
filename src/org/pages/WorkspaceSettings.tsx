@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react'
 import {
   Globe, Lock, Clock, Upload, Eye, Bell, Loader2, AlertCircle,
   Shield, Smartphone, Mail, Moon, Sun, Monitor, EyeOff, Trash2,
+  AlertTriangle,
 } from 'lucide-react'
 import { useOrgBranding } from '../contexts/OrgBrandingContext'
 import { useAuth } from '../../hooks/useAuth'
@@ -54,6 +55,13 @@ export default function OrgWorkspaceSettings() {
   const [pwError, setPwError] = useState<string | null>(null)
   const [pwSuccess, setPwSuccess] = useState<string | null>(null)
 
+  // Workspace closure state
+  const [showCloseModal, setShowCloseModal] = useState(false)
+  const [closePassword, setClosePassword] = useState('')
+  const [closeConfirmation, setCloseConfirmation] = useState('')
+  const [closeSubmitting, setCloseSubmitting] = useState(false)
+  const [closeError, setCloseError] = useState<string | null>(null)
+
   const loadSettings = useCallback(() => {
     if (!orgId) { setLoading(false); return }
     setLoading(true)
@@ -68,6 +76,23 @@ export default function OrgWorkspaceSettings() {
       setConfig(c)
     }).catch(() => setError('Failed to load settings')).finally(() => setLoading(false))
   }, [orgId])
+
+  const handleCloseWorkspace = async () => {
+    setCloseError(null)
+    if (!closePassword) { setCloseError('Your password is required.'); return }
+    if (!closeConfirmation) { setCloseError('Please type your workspace name to confirm.'); return }
+    if (closeConfirmation !== profile.organizationName) { setCloseError('Workspace name does not match.'); return }
+
+    setCloseSubmitting(true)
+    try {
+      await orgSettingsService.closeWorkspace(closePassword, closeConfirmation)
+      window.location.href = '/'
+    } catch (err: any) {
+      setCloseError(err?.message || 'Failed to close workspace.')
+    } finally {
+      setCloseSubmitting(false)
+    }
+  }
 
   useEffect(() => {
     loadSettings()
@@ -582,6 +607,81 @@ export default function OrgWorkspaceSettings() {
             </button>
           </div>
         </DashboardCard>
+
+        <DashboardCard hover={false}>
+          <h2 className="text-xs font-bold text-brand-text-primary mb-2 flex items-center gap-2">
+            <AlertTriangle size={14} className="text-status-error" /> Danger Zone
+          </h2>
+          <p className="text-[10px] text-brand-text-muted mb-4">
+            Closing your workspace will make it unavailable to all team members.
+            Historical data will be preserved but you will not be able to access it
+            without contacting support.
+          </p>
+          <button
+            onClick={() => setShowCloseModal(true)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border border-status-error/30 text-status-error hover:bg-status-error/10 transition-all"
+          >
+            <Trash2 size={14} /> Close Workspace
+          </button>
+        </DashboardCard>
+
+        {showCloseModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)' }}>
+            <div className="glass-card rounded-2xl p-6 max-w-md w-full shadow-xl">
+              <h3 className="text-sm font-bold text-brand-text-primary mb-2 flex items-center gap-2">
+                <AlertTriangle size={16} className="text-status-error" /> Close Workspace
+              </h3>
+              <p className="text-[10px] text-brand-text-muted mb-4">
+                This action requires your password and workspace name confirmation.
+                This cannot be undone without contacting support.
+              </p>
+              {closeError && (
+                <div className="mb-3 p-3 bg-status-error/10 border border-status-error/20 rounded-xl text-status-error text-[10px] font-semibold">
+                  {closeError}
+                </div>
+              )}
+              <div className="space-y-3">
+                <PasswordField
+                  id="closePassword"
+                  label="Your Password"
+                  value={closePassword}
+                  onChange={setClosePassword}
+                  placeholder="Enter your password"
+                  disabled={closeSubmitting}
+                />
+                <div>
+                  <label className="block text-[10px] text-brand-text-muted font-bold mb-1">
+                    Type <span className="text-brand-text-primary font-semibold">{profile.organizationName}</span> to confirm
+                  </label>
+                  <input
+                    type="text"
+                    value={closeConfirmation}
+                    onChange={(e) => setCloseConfirmation(e.target.value)}
+                    placeholder={profile.organizationName}
+                    disabled={closeSubmitting}
+                    className="w-full bg-brand-bg-secondary/50 border border-brand-divider rounded-xl px-4 py-2.5 text-xs text-brand-text-primary focus:outline-none transition-all"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-3 mt-5">
+                <button
+                  onClick={() => { setShowCloseModal(false); setClosePassword(''); setCloseConfirmation(''); setCloseError(null) }}
+                  disabled={closeSubmitting}
+                  className="flex-1 px-4 py-2.5 rounded-xl text-xs font-bold border border-brand-divider text-brand-text-muted hover:bg-brand-surface-interactive/30 transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCloseWorkspace}
+                  disabled={closeSubmitting}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold bg-status-error text-white disabled:opacity-50 transition-all"
+                >
+                  {closeSubmitting ? <><Loader2 size={14} className="animate-spin" /> Closing...</> : 'Close Workspace'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </>)}
       </> )}
     </div>
