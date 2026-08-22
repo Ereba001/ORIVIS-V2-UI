@@ -16,6 +16,8 @@ import { useOrgBranding } from '../contexts/OrgBrandingContext'
 import { useNotifications } from '../../hooks/useNotifications'
 import NotificationBell from '../../components/NotificationBell'
 import NotificationToasts from '../../components/NotificationToasts'
+import WorkspaceSuspended from '../components/WorkspaceSuspended'
+import WorkspaceClosed from '../components/WorkspaceClosed'
 
 const QUICK_ACTIONS = [
   { id: 'qa-1', label: 'Create Event', description: 'Set up a new election, poll or survey', href: '/org/events/create' },
@@ -535,7 +537,7 @@ export default function OrgLayout() {
       </aside>
 
       <div
-        className="flex-1 flex flex-col min-h-screen min-w-0 overflow-x-hidden transition-all duration-300"
+        className="flex-1 flex flex-col min-h-screen min-w-0 overflow-x-clip transition-all duration-300"
         style={{ marginLeft: isDesktop ? (sidebarCollapsed ? '64px' : '240px') : '0px' }}
       >
         {/* Sections 7 & 8: Governance Banner — single unified banner for all workspace sessions */}
@@ -830,10 +832,16 @@ export default function OrgLayout() {
          </header>
 
         <main
-          className={`flex-1 p-4 lg:p-6 xl:p-8 overflow-x-hidden ${isInspection ? 'pt-24' : ''}`}
+          className={`flex-1 p-4 lg:p-6 xl:p-8 overflow-x-auto ${isInspection ? 'pt-24' : ''}`}
           role="main"
         >
-          <Outlet />
+          {branding.organizationStatus === 'closed' ? (
+            <WorkspaceClosed organizationName={branding.organizationName} />
+          ) : branding.organizationStatus === 'suspended' ? (
+            <WorkspaceSuspended organizationName={branding.organizationName} />
+          ) : (
+            <Outlet />
+          )}
         </main>
       </div>
     </div>
@@ -1025,7 +1033,11 @@ function MobileSidebarContent({ branding, admin, location, navigate, onClose }: 
             <button
               key={item.path}
               onClick={() => navigate(item.path)}
-              className="relative w-full flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-left transition-all"
+              className={`relative w-full flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-left transition-all ${
+                isActive
+                  ? ''
+                  : 'text-brand-text-muted hover:bg-brand-surface-interactive hover:text-brand-text-secondary'
+              }`}
               style={isActive ? { backgroundColor: 'color-mix(in srgb, var(--org-primary) 10%, transparent)', color: 'var(--org-primary)' } : {}}
               aria-current={isActive ? 'page' : undefined}
             >
@@ -1053,7 +1065,11 @@ function MobileSidebarContent({ branding, admin, location, navigate, onClose }: 
             <button
               key={item.path}
               onClick={() => navigate(item.path)}
-              className="relative w-full flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-left transition-all"
+              className={`relative w-full flex items-center gap-3 px-4 py-2 text-sm font-medium rounded-lg text-left transition-all ${
+                isActive
+                  ? ''
+                  : 'text-brand-text-muted hover:bg-brand-surface-interactive hover:text-brand-text-secondary'
+              }`}
               style={isActive ? { backgroundColor: 'color-mix(in srgb, var(--org-primary) 10%, transparent)', color: 'var(--org-primary)' } : {}}
               aria-current={isActive ? 'page' : undefined}
             >

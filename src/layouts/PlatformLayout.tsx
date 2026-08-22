@@ -14,7 +14,7 @@ import OrivisLogo from "../components/OrivisLogo"
 import { usePlatformNotifications } from "../hooks/usePlatformNotifications"
 import NotificationBell from "../components/NotificationBell"
 import NotificationToasts from "../components/NotificationToasts"
-import WorkspaceImpersonationBanner from "../components/platform/WorkspaceImpersonationBanner"
+import WorkspaceAccessOverlay from "../components/platform/WorkspaceAccessOverlay"
 import { usePlatformGovernance } from "../contexts/PlatformGovernanceContext"
 
 type NavItem = { label: string; path: string; icon: LucideIcon; permission: string }
@@ -314,7 +314,7 @@ export default function PlatformLayout() {
                   </div>
                 </div>
                 <button onClick={handleLogout}
-                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-brand-gold hover:bg-brand-gold-hover text-white text-xs font-semibold transition-colors">
+                  className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-brand-gold hover:bg-brand-gold-hover text-brand-bg-secondary text-xs font-semibold transition-colors">
                   <LogOut size={14} /> Sign Out
                 </button>
               </div>
@@ -325,16 +325,14 @@ export default function PlatformLayout() {
 
       {/* Main area */}
       <div className="flex-1 flex flex-col min-h-screen min-w-0 transition-all duration-300" style={{ marginLeft: isDesktop ? (sidebarCollapsed ? '64px' : '240px') : '0px' }}>
-        {/* Workspace impersonation banner */}
-        <AnimatePresence>
-          {inspection.isActive && inspection.organizationId && (
-            <WorkspaceImpersonationBanner
-              organizationName={inspection.organizationName ?? 'Unknown Workspace'}
-              mode={inspection.mode}
-              onExit={() => exitInspection()}
-            />
-          )}
-        </AnimatePresence>
+        {/* Workspace access floating overlay */}
+        {inspection.isActive && inspection.organizationId && (
+          <WorkspaceAccessOverlay
+            organizationName={inspection.organizationName ?? 'Unknown Workspace'}
+            mode={inspection.mode}
+            onExit={() => exitInspection()}
+          />
+        )}
 
         {/* Header */}
         <header className="bg-brand-surface sticky top-0 z-20 border-b border-brand-divider" role="banner">
@@ -436,7 +434,7 @@ export default function PlatformLayout() {
                           Platform Settings
                         </button>
                         <button onClick={handleLogout}
-                          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-brand-gold hover:bg-brand-gold-hover text-white text-xs font-semibold transition-colors mt-1">
+                          className="w-full flex items-center gap-2 px-3 py-2 rounded-xl bg-brand-gold hover:bg-brand-gold-hover text-brand-bg-secondary text-xs font-semibold transition-colors mt-1">
                           <LogOut size={14} />
                           Sign Out
                         </button>

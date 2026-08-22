@@ -39,6 +39,15 @@ export default function PublicLayout() {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [mobileMenuOpen]);
+
   const isMainPage = publicPaths.includes(location.pathname);
   return (
     <div className="min-h-screen bg-brand-bg flex flex-col font-sans antialiased selection:bg-brand-gold selection:text-brand-bg-secondary relative">
@@ -46,7 +55,7 @@ export default function PublicLayout() {
 
         <nav className={`${
         isScrolled
-          ? "fixed top-0 left-0 right-0 glass border-b border-brand-border overflow-hidden flex items-center h-14"
+          ? "fixed top-0 left-0 right-0 glass border-b border-brand-border flex items-center h-14"
           : "fixed top-0 left-0 right-0 bg-transparent border-b border-transparent"
         } z-50 w-full px-4 sm:px-6 md:px-12 transition-all duration-300`} aria-label="Main navigation">
         <div className="max-w-7xl mx-auto w-full flex items-center justify-between gap-4">
@@ -179,7 +188,7 @@ export default function PublicLayout() {
                 transition={{ duration: 0.2 }}
                 className={`absolute ${
                   isScrolled ? "top-[68px]" : "top-[130px]"
-                } left-0 right-0 w-full glass-strong border-b border-brand-border p-6 shadow-xl flex flex-col gap-4 z-40 md:hidden`}
+                } left-0 right-0 w-full glass-strong border-b border-brand-border p-6 shadow-xl flex flex-col gap-4 z-50 md:hidden`}
               >
                 <div className="flex flex-col gap-2">
                   {navLinks.map((link) => {
