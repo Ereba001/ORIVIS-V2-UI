@@ -236,8 +236,8 @@ export default function OrgBilling() {
         </div>
         {filteredEvents.length === 0 ? (
           <EmptyState icon={FileText} title='No billing records' description='Event billing records will appear here once events are created and billed.' />
-        ) : (
-          <div className='overflow-x-auto'>
+        ) : (<>
+          <div className='hidden lg:block overflow-x-auto'>
             <table className='w-full text-left'>
               <thead>
                 <tr className='border-b border-brand-divider'>
@@ -284,7 +284,44 @@ export default function OrgBilling() {
               </tbody>
             </table>
           </div>
-        )}
+          <div className='lg:hidden divide-y divide-brand-divider'>
+            {filteredEvents.map(ev => {
+              const st = STATUS_STYLE[ev.status] ?? STATUS_STYLE.cancelled
+              const StIcon = st.icon
+              const isPaid = ev.status === 'paid' || ev.status === 'free_granted'
+              return (
+                <div key={ev.uuid} className='py-3 space-y-2 first:pt-0 last:pb-0'>
+                  <div className='flex items-center justify-between gap-2'>
+                    <p className='text-xs font-semibold text-brand-text-primary truncate'>{ev.election_title}</p>
+                    <span className={`inline-flex items-center gap-1 text-[9px] font-bold capitalize shrink-0 ${st.className}`}><StIcon size={10} />{st.label}</span>
+                  </div>
+                  <div className='grid grid-cols-2 gap-2'>
+                    <div>
+                      <p className='text-[10px] text-brand-text-muted'>Tier</p>
+                      <p className='text-xs text-brand-text-primary'>{ev.tier_name ?? (ev.is_free ? 'Free' : '\u2014')}</p>
+                    </div>
+                    <div>
+                      <p className='text-[10px] text-brand-text-muted'>Participants</p>
+                      <p className='text-xs font-bold text-brand-text-primary'>{ev.participant_count?.toLocaleString() ?? '0'}</p>
+                    </div>
+                    <div>
+                      <p className='text-[10px] text-brand-text-muted'>Amount</p>
+                      <p className='text-xs font-bold text-brand-text-primary'>{formatMoney(ev.amount, ev.currency)}</p>
+                    </div>
+                    <div>
+                      <p className='text-[10px] text-brand-text-muted'>Paid</p>
+                      <p className='text-xs font-bold' style={{ color: isPaid ? '#22C55E' : '#F59E0B' }}>{formatMoney(ev.paid_amount, ev.currency)}</p>
+                    </div>
+                  </div>
+                  <div className='flex items-center gap-3 pt-1'>
+                    <button type='button' onClick={() => setSelectedReceipt({ kind: 'billing', title: ev.election_title, reference: ev.uuid, status: ev.status, amount: ev.amount, paidAmount: ev.paid_amount, currency: ev.currency, date: ev.created_at })} className='inline-flex items-center gap-1 text-[9px] font-bold hover:opacity-80' style={{ color: pColor }}><Receipt size={10} /> View Receipt</button>
+                    <Link to={ROUTES.ORG.EVENT_DETAIL(String(ev.election_id))} className='inline-flex items-center gap-1 text-[9px] font-bold hover:opacity-80' style={{ color: pColor }}><ExternalLink size={10} /> View Event</Link>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </>)}
       </DashboardCard>
 
       <DashboardCard hover={false}>
@@ -298,42 +335,76 @@ export default function OrgBilling() {
         {paymentsResource.loading ? <SkeletonLoader rows={3} variant='card' />
           : paymentsResource.error ? <EmptyState icon={AlertCircle} title='Failed to load payments' description={paymentsResource.error} action={{ label: 'Retry', onClick: paymentsResource.reload }} />
           : payments.length === 0 ? <EmptyState icon={Vote} title='No event payments' description='Payment records for your events will appear here.' />
-          : (<div className='overflow-x-auto'>
-            <table className='w-full text-left'>
-              <thead>
-                <tr className='border-b border-brand-divider'>
-                  <th className='pb-2 pr-3 text-[9px] font-bold uppercase tracking-wide text-brand-text-muted'>Event</th>
-                  <th className='pb-2 pr-3 text-[9px] font-bold uppercase tracking-wide text-brand-text-muted'>Reference</th>
-                  <th className='pb-2 pr-3 text-[9px] font-bold uppercase tracking-wide text-brand-text-muted text-right'>Amount</th>
-                  <th className='pb-2 pr-3 text-[9px] font-bold uppercase tracking-wide text-brand-text-muted text-right'>Status</th>
-                  <th className='pb-2 pr-3 text-[9px] font-bold uppercase tracking-wide text-brand-text-muted text-right'>Receipt</th>
-                  <th className='pb-2 text-[9px] font-bold uppercase tracking-wide text-brand-text-muted text-right'>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {payments.map(p => {
-                  const st = STATUS_STYLE[p.status] ?? STATUS_STYLE.cancelled
-                  return (<tr key={p.uuid} className='border-b border-brand-divider last:border-0'>
-                    <td className='py-2.5 pr-3'>
-                      <p className='text-xs font-semibold text-brand-text-primary truncate max-w-[240px]'>{p.election?.title ?? '\u2014'}</p>
-                      {p.provider && <p className='text-[9px] font-mono text-brand-text-muted'>{p.provider}</p>}
-                    </td>
-                    <td className='py-2.5 pr-3 text-[10px] font-mono text-brand-text-muted whitespace-nowrap'>{p.reference}</td>
-                    <td className='py-2.5 pr-3 text-xs font-bold text-brand-text-primary text-right whitespace-nowrap'>{formatMoney(p.amount, p.currency)}</td>
-                    <td className='py-2.5 pr-3 text-right'>
-                      <span className={`inline-flex items-center gap-1 text-[9px] font-bold capitalize ${st.className}`}>
-                        {p.status === 'verified' ? <CheckCircle2 size={10} /> : p.status === 'pending' ? <Clock size={10} /> : <AlertCircle size={10} />}{st.label}
-                      </span>
-                    </td>
-                    <td className='py-2.5 pr-3 text-right'>
-                      <button type='button' onClick={() => setSelectedReceipt({ kind: 'payment', title: p.election?.title ?? 'Event payment', reference: p.reference, status: p.status, amount: p.amount, currency: p.currency, date: p.created_at, provider: p.provider })} className='inline-flex items-center gap-1 text-[9px] font-bold hover:opacity-80' style={{ color: pColor }}><Receipt size={10} /> View Receipt</button>
-                    </td>
-                    <td className='py-2.5 text-right text-[10px] font-mono text-brand-text-muted whitespace-nowrap'>{new Date(p.created_at).toLocaleDateString()}</td>
-                  </tr>)
-                })}
-              </tbody>
-            </table>
-          </div>)
+          : (<>
+            <div className='hidden lg:block overflow-x-auto'>
+              <table className='w-full text-left'>
+                <thead>
+                  <tr className='border-b border-brand-divider'>
+                    <th className='pb-2 pr-3 text-[9px] font-bold uppercase tracking-wide text-brand-text-muted'>Event</th>
+                    <th className='pb-2 pr-3 text-[9px] font-bold uppercase tracking-wide text-brand-text-muted'>Reference</th>
+                    <th className='pb-2 pr-3 text-[9px] font-bold uppercase tracking-wide text-brand-text-muted text-right'>Amount</th>
+                    <th className='pb-2 pr-3 text-[9px] font-bold uppercase tracking-wide text-brand-text-muted text-right'>Status</th>
+                    <th className='pb-2 pr-3 text-[9px] font-bold uppercase tracking-wide text-brand-text-muted text-right'>Receipt</th>
+                    <th className='pb-2 text-[9px] font-bold uppercase tracking-wide text-brand-text-muted text-right'>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {payments.map(p => {
+                    const st = STATUS_STYLE[p.status] ?? STATUS_STYLE.cancelled
+                    return (<tr key={p.uuid} className='border-b border-brand-divider last:border-0'>
+                      <td className='py-2.5 pr-3'>
+                        <p className='text-xs font-semibold text-brand-text-primary truncate max-w-[240px]'>{p.election?.title ?? '\u2014'}</p>
+                        {p.provider && <p className='text-[9px] font-mono text-brand-text-muted'>{p.provider}</p>}
+                      </td>
+                      <td className='py-2.5 pr-3 text-[10px] font-mono text-brand-text-muted whitespace-nowrap'>{p.reference}</td>
+                      <td className='py-2.5 pr-3 text-xs font-bold text-brand-text-primary text-right whitespace-nowrap'>{formatMoney(p.amount, p.currency)}</td>
+                      <td className='py-2.5 pr-3 text-right'>
+                        <span className={`inline-flex items-center gap-1 text-[9px] font-bold capitalize ${st.className}`}>
+                          {p.status === 'verified' ? <CheckCircle2 size={10} /> : p.status === 'pending' ? <Clock size={10} /> : <AlertCircle size={10} />}{st.label}
+                        </span>
+                      </td>
+                      <td className='py-2.5 pr-3 text-right'>
+                        <button type='button' onClick={() => setSelectedReceipt({ kind: 'payment', title: p.election?.title ?? 'Event payment', reference: p.reference, status: p.status, amount: p.amount, currency: p.currency, date: p.created_at, provider: p.provider })} className='inline-flex items-center gap-1 text-[9px] font-bold hover:opacity-80' style={{ color: pColor }}><Receipt size={10} /> View Receipt</button>
+                      </td>
+                      <td className='py-2.5 text-right text-[10px] font-mono text-brand-text-muted whitespace-nowrap'>{new Date(p.created_at).toLocaleDateString()}</td>
+                    </tr>)
+                  })}
+                </tbody>
+              </table>
+            </div>
+            <div className='lg:hidden divide-y divide-brand-divider'>
+              {payments.map(p => {
+                const st = STATUS_STYLE[p.status] ?? STATUS_STYLE.cancelled
+                const PIcon = p.status === 'verified' ? CheckCircle2 : p.status === 'pending' ? Clock : AlertCircle
+                return (
+                  <div key={p.uuid} className='py-3 space-y-2 first:pt-0 last:pb-0'>
+                    <div className='flex items-center justify-between gap-2'>
+                      <p className='text-xs font-semibold text-brand-text-primary truncate'>{p.election?.title ?? '\u2014'}</p>
+                      <span className={`inline-flex items-center gap-1 text-[9px] font-bold capitalize shrink-0 ${st.className}`}><PIcon size={10} />{st.label}</span>
+                    </div>
+                    <div className='grid grid-cols-2 gap-2'>
+                      <div>
+                        <p className='text-[10px] text-brand-text-muted'>Reference</p>
+                        <p className='text-xs font-mono text-brand-text-primary'>{p.reference}</p>
+                      </div>
+                      <div>
+                        <p className='text-[10px] text-brand-text-muted'>Amount</p>
+                        <p className='text-xs font-bold text-brand-text-primary'>{formatMoney(p.amount, p.currency)}</p>
+                      </div>
+                      <div>
+                        <p className='text-[10px] text-brand-text-muted'>Receipt</p>
+                        <button type='button' onClick={() => setSelectedReceipt({ kind: 'payment', title: p.election?.title ?? 'Event payment', reference: p.reference, status: p.status, amount: p.amount, currency: p.currency, date: p.created_at, provider: p.provider })} className='inline-flex items-center gap-1 text-[9px] font-bold hover:opacity-80' style={{ color: pColor }}><Receipt size={10} /> View Receipt</button>
+                      </div>
+                      <div>
+                        <p className='text-[10px] text-brand-text-muted'>Date</p>
+                        <p className='text-xs font-mono text-brand-text-primary'>{new Date(p.created_at).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </>)
         }
       </DashboardCard>
       <ReceiptModal receipt={selectedReceipt} onClose={() => setSelectedReceipt(null)} />

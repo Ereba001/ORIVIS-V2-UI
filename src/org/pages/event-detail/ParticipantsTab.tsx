@@ -318,7 +318,7 @@ export function ParticipantsTab({ event, participants, registrationSettings, loc
               )}
             </div>
           )}
-          <div className="overflow-x-auto">
+          <div className="hidden lg:block overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-brand-divider">
@@ -424,6 +424,93 @@ export function ParticipantsTab({ event, participants, registrationSettings, loc
                 ))}
               </tbody>
             </table>
+          </div>
+          <div className="lg:hidden divide-y divide-brand-divider">
+            {paged.map((p) => (
+              <div key={p.id} className="px-3 py-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <input name="selectParticipant" type="checkbox" checked={selectedIds.has(p.id)} onChange={() => toggleSelect(p.id)} aria-label="Select participant"
+                      className="w-3.5 h-3.5 rounded border-brand-border accent-[var(--org-primary)]" />
+                    <div className="w-7 h-7 rounded-full flex items-center justify-center text-[8px] font-bold text-white shrink-0"
+                      style={{ backgroundColor: pColor }}>
+                      {p.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                    </div>
+                    <span className="text-xs font-semibold text-brand-text-primary">{p.name}</span>
+                  </div>
+                  <button
+                    onClick={(e) => {
+                      if (menuOpenId === p.id) { setMenuOpenId(null); setMenuPos(null) }
+                      else {
+                        const rect = e.currentTarget.getBoundingClientRect()
+                        setMenuPos({ top: rect.bottom + 4, right: window.innerWidth - rect.right })
+                        setMenuOpenId(p.id)
+                      }
+                    }}
+                    className="p-1 rounded-lg hover:bg-brand-surface-interactive text-brand-text-muted cursor-pointer"
+                  >
+                    <MoreHorizontal size={14} />
+                  </button>
+                  {menuOpenId === p.id && menuPos && createPortal(
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => { setMenuOpenId(null); setMenuPos(null) }} />
+                      <div className="fixed z-50 w-36 bg-brand-surface border border-brand-border rounded-xl py-1 shadow-xl" style={{ top: menuPos.top, right: menuPos.right }}>
+                        <button
+                          onClick={() => { setToast({ message: `Name: ${p.name}\nEmail: ${p.email}\nReg: ${p.registrationStatus}\nVer: ${p.verificationStatus}\nPass: ${p.votingPassStatus}`, type: 'info' }); setMenuOpenId(null); setMenuPos(null) }}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-[10px] font-mono text-brand-text-muted hover:text-brand-text-primary hover:bg-brand-surface-interactive transition-colors"
+                        >
+                          <Eye size={12} />
+                          View Details
+                        </button>
+                        {!locked && (
+                          <button
+                            onClick={async () => { await getApiClient().put(API.ENDPOINTS.VOTERS.BASE(event.id) + `/${p.id}`, { registrationStatus: 'approved' }); setMenuOpenId(null); setMenuPos(null); onDataChanged?.() }}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-[10px] font-mono text-brand-text-muted hover:text-brand-text-primary hover:bg-brand-surface-interactive transition-colors"
+                          >
+                            <UserCheck size={12} />
+                            Approve
+                          </button>
+                        )}
+                        {!locked && (
+                          <button
+                            onClick={async () => { setConfirmDialog({ message: `Remove participant "${p.name}"?`, onConfirm: async () => { await getApiClient().delete(API.ENDPOINTS.VOTERS.BASE(event.id) + `/${p.id}`); setMenuOpenId(null); setMenuPos(null); onDataChanged?.() } }) }}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-[10px] font-mono text-status-error hover:bg-brand-surface-interactive transition-colors"
+                          >
+                            <Trash2 size={12} />
+                            Remove
+                          </button>
+                        )}
+                      </div>
+                    </>,
+                    document.body
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-x-4 gap-y-1.5">
+                  <div>
+                    <span className="text-[8px] text-brand-text-muted font-bold block">Email</span>
+                    <span className="text-[10px] text-brand-text-primary truncate block">{p.email}</span>
+                  </div>
+                  <div>
+                    <span className="text-[8px] text-brand-text-muted font-bold block">Registration</span>
+                    <span className={`inline-block text-[8px] px-1.5 py-0.5 rounded-full border ${PARTICIPANT_REG_STYLES[p.registrationStatus] || ''}`}>
+                      {p.registrationStatus}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[8px] text-brand-text-muted font-bold block">Verification</span>
+                    <span className={`inline-block text-[8px] px-1.5 py-0.5 rounded-full border ${VERIFICATION_STYLES[p.verificationStatus] || ''}`}>
+                      {p.verificationStatus}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-[8px] text-brand-text-muted font-bold block">Pass Status</span>
+                    <span className={`inline-block text-[8px] px-1.5 py-0.5 rounded-full border ${PASS_STYLES[p.votingPassStatus] || ''}`}>
+                      {p.votingPassStatus.replace('_', ' ')}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
           {totalPages > 1 && (
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-4 pt-4 border-t border-brand-divider">

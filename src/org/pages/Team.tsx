@@ -446,7 +446,7 @@ export default function OrgTeam() {
                 className="w-full bg-brand-bg-secondary/50 border border-brand-border rounded-xl pl-9 pr-4 py-2.5 text-xs text-brand-text-primary placeholder-brand-text-disabled focus:outline-none transition-all"
                 style={{ borderColor: 'var(--org-primary)/30' }} />
             </div>
-            <div className="flex items-center gap-2 overflow-x-auto">
+            <div className="flex flex-wrap items-center gap-2">
               {(['all', 'active', 'invited', 'suspended'] as const).map((s) => (
                 <button key={s} onClick={() => { setStatusFilter(s); setPage(1) }}
                   className={`px-3 py-1.5 rounded-lg text-[9px] font-bold transition-all ${
@@ -471,7 +471,8 @@ export default function OrgTeam() {
                   </button>
                 </div>
               )}
-              <div className="overflow-x-auto">
+              {/* Desktop table */}
+              <div className="hidden lg:block overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="border-b border-brand-divider">
@@ -575,6 +576,83 @@ export default function OrgTeam() {
                     })}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Mobile cards */}
+              <div className="lg:hidden divide-y divide-brand-divider">
+                {paged.map((member) => {
+                  const RoleIcon = ROLE_ICONS[member.role] || Users
+                  return (
+                    <div key={member.id} className="px-3 py-3 space-y-2">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex items-center gap-3 min-w-0 flex-1">
+                          <div className="w-9 h-9 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 text-white"
+                            style={{ backgroundColor: pColor }}>
+                            {member.displayName.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="text-xs font-semibold text-brand-text-primary truncate">{member.displayName}</p>
+                            <p className="text-[9px] text-brand-text-muted truncate">{member.email}</p>
+                          </div>
+                        </div>
+                        <div className="relative shrink-0">
+                          <button onClick={(e) => {
+                            if (openMemberActions === member.id) {
+                              setOpenMemberActions(null); setMenuPos(null)
+                            } else {
+                              const rect = e.currentTarget.getBoundingClientRect()
+                              setMenuPos({ top: rect.bottom + 4, right: window.innerWidth - rect.right })
+                              setOpenMemberActions(member.id)
+                            }
+                          }}
+                            className="p-1 rounded-lg hover:bg-brand-surface-interactive text-brand-text-muted cursor-pointer">
+                            <MoreHorizontal size={14} />
+                          </button>
+                          {openMemberActions === member.id && menuPos && createPortal(
+                            <>
+                              <div className="fixed inset-0 z-40" onClick={() => { setOpenMemberActions(null); setMenuPos(null) }} />
+                              <div className="fixed z-50 w-44 bg-brand-surface border border-brand-border rounded-xl shadow-lg py-1" style={{ top: menuPos.top, right: menuPos.right }}>
+                                <div className="px-3 py-2 border-b border-brand-divider">
+                                  <p className="text-[9px] text-brand-text-muted font-bold">Change Role</p>
+                                  <div className="flex flex-wrap gap-1 mt-1">
+                                    {data.roles.map((r) => (
+                                      <button key={r.id} onClick={() => handleChangeRole(member.id, r.slug)}
+                                        disabled={busyMemberId === member.id || member.role === r.name}
+                                        className={`text-[8px] px-2 py-0.5 rounded border transition-all ${
+                                          member.role === r.name
+                                            ? 'border-[var(--org-primary)] text-white'
+                                            : 'border-brand-border text-brand-text-muted hover:border-[var(--org-primary)]/50'
+                                        }`}
+                                        style={member.role === r.name ? { backgroundColor: pColor } : {}}>
+                                        {r.name}
+                                      </button>
+                                    ))}
+                                  </div>
+                                </div>
+                                <button onClick={() => handleRemoveMember(member.id, member.displayName)}
+                                  disabled={busyMemberId === member.id}
+                                  className="w-full flex items-center gap-2 px-3 py-2 text-[10px] text-status-error hover:bg-brand-surface-interactive">
+                                  {busyMemberId === member.id ? <Loader2 size={12} className="animate-spin" /> : <UserMinus size={12} />}
+                                  Remove Member
+                                </button>
+                              </div>
+                            </>,
+                            document.body
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 pl-12">
+                        <span className="inline-flex items-center gap-1 text-[9px] font-bold" style={{ color: pColor }}>
+                          <RoleIcon size={10} />{member.role}
+                        </span>
+                        <span className={`text-[9px] px-2 py-0.5 rounded-full border ${(STATUS_STYLES as Record<string, string>)[member.status] ?? STATUS_STYLES.active}`}>
+                          {member.status}
+                        </span>
+                        <span className="text-[9px] text-brand-text-muted ml-auto">{member.lastActive}</span>
+                      </div>
+                    </div>
+                  )
+                })}
               </div>
               {totalPages > 1 && (
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-4 pt-4 border-t border-brand-divider">

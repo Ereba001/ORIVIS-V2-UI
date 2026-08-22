@@ -367,7 +367,7 @@ export function RegistrationTab({ event, registration, registrationSettings, par
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-xs font-bold text-brand-text-primary">Imported Voters ({totalUploaded})</h3>
               </div>
-              <div className="overflow-x-auto">
+              <div className="hidden lg:block overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="border-b border-brand-divider">
@@ -423,6 +423,65 @@ export function RegistrationTab({ event, registration, registrationSettings, par
                 </table>
                 {voterList.length > 50 && (
                   <p className="text-[9px] text-brand-text-muted mt-2 text-center">Showing 50 of {totalUploaded} voters</p>
+                )}
+              </div>
+
+              <div className="lg:hidden divide-y divide-brand-divider">
+                {voterList.slice(0, 50).map((voter) => (
+                  <div key={voter.id} className="py-3 space-y-2">
+                    <div className="flex items-start justify-between">
+                      <span className="text-[10px] font-medium text-brand-text-primary">{voter.name}</span>
+                      {voter.votingPassStatus === 'issued' && (
+                        <button
+                          onClick={() => { setDirectVoteVoter({ uuid: voter.id, name: voter.name }); setShowDirectVote(true) }}
+                          className="text-[9px] font-bold px-2 py-1 rounded-lg bg-brand-surface-elevated/30 border border-brand-divider text-brand-text-muted hover:bg-brand-surface-interactive transition-colors"
+                        >
+                          Vote
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-2 gap-2 text-[10px]">
+                      <div>
+                        <span className="text-brand-text-muted">Email</span>
+                        <p className="text-brand-text-primary truncate">{voter.email || '—'}</p>
+                      </div>
+                      <div>
+                        <span className="text-brand-text-muted">Verification</span>
+                        <p>
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-bold border ${
+                            voter.verificationStatus === 'verified'
+                              ? 'bg-status-success/10 text-status-success border-status-success/20'
+                              : 'bg-status-warning/10 text-status-warning border-status-warning/20'
+                          }`}>
+                            {voter.verificationStatus === 'verified' ? 'Verified' : 'Pending'}
+                          </span>
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-brand-text-muted">Pass Status</span>
+                        <p>
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8px] font-bold border ${
+                            PASS_STYLES[voter.votingPassStatus] ?? PASS_STYLES.not_issued
+                          }`}>
+                            {voter.votingPassStatus === 'issued' ? 'Issued' : voter.votingPassStatus === 'used' ? 'Used' : 'Not Issued'}
+                          </span>
+                        </p>
+                      </div>
+                      <div>
+                        <span className="text-brand-text-muted">Voted</span>
+                        <p>
+                          {voter.votingPassStatus === 'used' ? (
+                            <CheckCircle size={12} className="text-status-success" />
+                          ) : (
+                            <XCircle size={12} className="text-brand-text-muted/40" />
+                          )}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {voterList.length > 50 && (
+                  <p className="text-[9px] text-brand-text-muted pt-2 text-center">Showing 50 of {totalUploaded} voters</p>
                 )}
               </div>
             </DashboardCard>

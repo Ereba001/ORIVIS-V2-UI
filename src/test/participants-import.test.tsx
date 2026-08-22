@@ -292,8 +292,8 @@ describe('ParticipantsTab import flow', () => {
       />,
     )
 
-    expect(screen.getByText('Alice')).toBeTruthy()
-    expect(screen.getByText('Bob')).toBeTruthy()
+    expect(screen.getAllByText('Alice').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Bob').length).toBeGreaterThan(0)
 
     fireEvent.click(screen.getByText('ConfirmImport'))
 

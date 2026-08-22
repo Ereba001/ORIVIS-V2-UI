@@ -57,7 +57,8 @@ export function AuditTab({ event }: { event: OrivisEvent }) {
       ) : auditLogs.length === 0 ? (
         <EmptyState icon={Shield} title="No Audit Events" description="No audit events have been recorded for this election yet." />
       ) : (
-        <div className="overflow-x-auto">
+        <>
+        <div className="hidden lg:block overflow-x-auto">
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-brand-divider">
@@ -113,6 +114,56 @@ export function AuditTab({ event }: { event: OrivisEvent }) {
             </div>
           )}
         </div>
+
+        <div className="lg:hidden divide-y divide-brand-divider">
+          {auditLogs.map((log) => {
+            const sev = getSeverity(log.event)
+            const details = log.old_values?.lifecycle_state && log.new_values?.lifecycle_state
+              ? `${log.old_values.lifecycle_state} → ${log.new_values.lifecycle_state}`
+              : '—'
+            return (
+              <div key={log.id} className="px-3 py-3 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-brand-text-primary font-medium">{formatEventName(log.event)}</span>
+                  <span className={`text-[9px] px-2 py-0.5 rounded-full border ${SEVERITY_STYLES[sev]}`}>
+                    {sev}
+                  </span>
+                </div>
+                <div className="grid grid-cols-2 gap-y-1.5 gap-x-3 text-[10px]">
+                  <span className="text-brand-text-muted">Actor</span>
+                  <span className="text-brand-text-primary text-right">{log.user?.name ?? 'System'}</span>
+                  <span className="text-brand-text-muted">Details</span>
+                  <span className="text-brand-text-primary text-right truncate">{details}</span>
+                  <span className="text-brand-text-muted">IP</span>
+                  <span className="text-brand-text-primary text-right font-mono">{log.ip_address ?? '—'}</span>
+                  <span className="text-brand-text-muted">Timestamp</span>
+                  <span className="text-brand-text-primary text-right">{log.created_at ? timeAgo(log.created_at) : '—'}</span>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+
+        {auditTotal > 15 && (
+          <div className="lg:hidden flex items-center justify-center gap-2 mt-4">
+            <button
+              onClick={() => setAuditPage((p) => Math.max(1, p - 1))}
+              disabled={auditPage === 1}
+              className="px-3 py-1.5 rounded-lg text-[10px] font-bold border border-brand-divider text-brand-text-muted hover:bg-brand-surface-interactive disabled:opacity-40"
+            >
+              <ChevronLeft size={12} />
+            </button>
+            <span className="text-[10px] text-brand-text-muted">Page {auditPage}</span>
+            <button
+              onClick={() => setAuditPage((p) => p + 1)}
+              disabled={auditLogs.length < 15}
+              className="px-3 py-1.5 rounded-lg text-[10px] font-bold border border-brand-divider text-brand-text-muted hover:bg-brand-surface-interactive disabled:opacity-40"
+            >
+              <ChevronRight size={12} />
+            </button>
+          </div>
+        )}
+        </>
       )}
     </DashboardCard>
   )

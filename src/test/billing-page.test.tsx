@@ -46,9 +46,9 @@ describe('organization billing page', () => {
   it('links each event billing record to its real event workflow', () => {
     render(<MemoryRouter><OrgBilling /></MemoryRouter>)
 
-    expect(screen.getByRole('link', { name: /view event/i })).toHaveAttribute('href', '/org/events/42')
+    expect(screen.getAllByRole('link', { name: /view event/i })[0]).toHaveAttribute('href', '/org/events/42')
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: /view receipt/i }))
+    fireEvent.click(screen.getAllByRole('button', { name: /view receipt/i })[0])
     expect(screen.getByRole('dialog')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /print/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /download pdf/i })).toBeInTheDocument()

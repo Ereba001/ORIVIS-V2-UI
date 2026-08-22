@@ -162,8 +162,8 @@ describe('EventDetail roster stability across the lightweight poll', () => {
 
     // Initial load renders the roster in the participants tab.
     fireEvent.click(await screen.findByText('Participants'))
-    expect(await screen.findByText('Alice')).toBeTruthy()
-    expect(screen.getByText('Bob')).toBeTruthy()
+    expect((await screen.findAllByText('Alice')).length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Bob').length).toBeGreaterThan(0)
 
     // Run the 30s lightweight poll, which fetches the event detail with
     // skipVoters=true and would previously replace the roster with [].
@@ -174,8 +174,8 @@ describe('EventDetail roster stability across the lightweight poll', () => {
     })
 
     // The uploaded participants must survive the roster-skipping refresh.
-    expect(screen.getByText('Alice')).toBeTruthy()
-    expect(screen.getByText('Bob')).toBeTruthy()
+    expect(screen.getAllByText('Alice').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('Bob').length).toBeGreaterThan(0)
 
     // The publishing readiness "Participants" check must still pass.
     fireEvent.click(await screen.findByText('Publishing'))

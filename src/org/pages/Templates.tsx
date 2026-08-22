@@ -145,7 +145,7 @@ export default function OrgTemplates() {
           />
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+        <div className="flex flex-wrap items-center gap-2">
           {(['all', 'default', 'organization', 'recent'] as CategoryFilter[]).map((cat) => {
             const count = cat === 'all' ? MOCK_TEMPLATES.length : MOCK_TEMPLATES.filter((t) => t.category === cat).length
             const isActive = categoryFilter === cat

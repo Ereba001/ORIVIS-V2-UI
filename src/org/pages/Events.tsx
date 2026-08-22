@@ -315,7 +315,7 @@ export default function OrgEvents() {
           />
         </div>
 
-        <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+        <div className="flex flex-wrap items-center gap-2">
           {FILTER_TABS.map((tab) => {
             const count = tab.key === 'all' ? events.length : events.filter((e) => e.status === tab.key).length
             const isActive = activeTab === tab.key
@@ -338,7 +338,8 @@ export default function OrgEvents() {
           })}
         </div>
 
-        <div className="bg-brand-surface border border-brand-border rounded-2xl overflow-hidden">
+        {/* Desktop table */}
+        <div className="hidden lg:block bg-brand-surface border border-brand-border rounded-2xl overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
@@ -437,18 +438,106 @@ export default function OrgEvents() {
               </tbody>
             </table>
           </div>
-          {filtered.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="w-12 h-12 rounded-2xl bg-brand-surface-elevated flex items-center justify-center mb-3" style={{ color: 'var(--org-primary)' }}>
-                <BarChart3 size={24} />
-              </div>
-              <p className="text-sm font-semibold text-brand-text-primary mb-1">No Events Found</p>
-              <p className="text-xs text-brand-text-muted max-w-[240px]">
-                {search ? 'Try a different search term.' : 'No events match the selected filter.'}
-              </p>
-            </div>
-          )}
         </div>
+
+        {/* Mobile cards */}
+        <div className="lg:hidden bg-brand-surface border border-brand-border rounded-2xl divide-y divide-brand-border overflow-hidden">
+          {filtered.map((el, i) => (
+            <motion.div
+              key={el.id}
+              initial={{ opacity: 0, y: 4 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.03, duration: 0.2 }}
+              className="px-4 py-3 cursor-pointer active:bg-brand-surface-interactive/50 transition-colors"
+              onClick={() => navigate(el.status === 'draft' ? `${ROUTES.ORG.CREATE_EVENT}?draft=${el.id}` : `/org/events/${el.id}`)}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0 flex-1">
+                  <div className="w-8 h-8 rounded-lg bg-brand-surface-elevated flex items-center justify-center shrink-0" style={{ color: 'var(--org-primary)' }}>
+                    <Vote size={14} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-semibold text-brand-text-primary truncate">{el.title}</p>
+                    <p className="text-[10px] text-brand-text-muted mt-0.5">
+                      {el.voters.toLocaleString()} participants · {el.positions} positions
+                    </p>
+                  </div>
+                </div>
+                <div className="shrink-0 relative">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      if (menuOpenId === el.id) {
+                        closeMenu()
+                      } else {
+                        const rect = e.currentTarget.getBoundingClientRect()
+                        setMenuPos({ top: rect.bottom + 4, right: window.innerWidth - rect.right })
+                        setMenuOpenId(el.id)
+                      }
+                    }}
+                    className="p-1 rounded-lg hover:bg-brand-surface-interactive text-brand-text-muted cursor-pointer"
+                    aria-label={`Actions for ${el.title}`}
+                    disabled={busyId === el.id}
+                  >
+                    {busyId === el.id ? <Loader2 size={14} className="animate-spin" /> : <MoreHorizontal size={14} />}
+                  </button>
+                  {menuOpenId === el.id && menuPos && createPortal(
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={(e) => { e.stopPropagation(); closeMenu() }} />
+                      <div className="fixed z-50 w-44 bg-brand-surface border border-brand-border rounded-xl py-1 shadow-xl" style={{ top: menuPos.top, right: menuPos.right }}>
+                        {([
+                          { label: 'View Details', value: 'view' as EventAction, icon: Eye },
+                          ...(['ready', 'created'].includes(el.status) ? [{ label: 'Edit Event', value: 'edit' as EventAction, icon: Edit3 }] : []),
+                          ...(el.status === 'draft' ? [{ label: 'Continue Setup', value: 'edit' as EventAction, icon: Edit3 }] : []),
+                          ...(el.status === 'published' ? [{ label: 'Start Event', value: 'start' as EventAction, icon: Play }] : []),
+                          ...(el.status === 'live' ? [{ label: 'Stop Event', value: 'stop' as EventAction, icon: Square }] : []),
+                          ...(el.status === 'live' ? [{ label: 'Close Event', value: 'close' as EventAction, icon: X }] : []),
+                          ...(['draft', 'ready', 'created'].includes(el.status) ? [{ label: 'Publish', value: 'publish' as EventAction, icon: Globe }] : []),
+                          { label: 'Live Results', value: 'results' as EventAction, icon: BarChart3 },
+                          { label: 'Duplicate', value: 'duplicate' as EventAction, icon: Copy },
+                          { label: 'Archive', value: 'archive' as EventAction, icon: Archive },
+                          ...(el.status === 'draft' ? [{ label: 'Delete', value: 'delete' as EventAction, icon: Trash2 }] : []),
+                        ]).map((a) => {
+                          const ActionIcon = a.icon
+                          const danger = a.value === 'delete'
+                          return (
+                            <button
+                              key={a.value}
+                              onClick={(e) => { e.stopPropagation(); handleAction(el, a.value) }}
+                              className={`w-full flex items-center gap-2 px-3 py-2 text-[10px] font-mono transition-colors ${danger ? 'text-status-error hover:bg-status-error/10' : 'text-brand-text-muted hover:text-brand-text-primary hover:bg-brand-surface-interactive'}`}
+                            >
+                              <ActionIcon size={12} />
+                              {a.label}
+                            </button>
+                          )
+                        })}
+                      </div>
+                    </>,
+                    document.body
+                  )}
+                </div>
+              </div>
+              <div className="flex items-center gap-2 mt-2 pl-11">
+                <EventStatusBadge status={displayStatus(el)} />
+                <span className="text-[10px] text-brand-text-muted">
+                  {el.startsAt ? new Date(el.startsAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—'} — {el.endsAt ? new Date(el.endsAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) : '—'}
+                </span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {filtered.length === 0 && (
+          <div className="bg-brand-surface border border-brand-border rounded-2xl flex flex-col items-center justify-center py-16 text-center">
+            <div className="w-12 h-12 rounded-2xl bg-brand-surface-elevated flex items-center justify-center mb-3" style={{ color: 'var(--org-primary)' }}>
+              <BarChart3 size={24} />
+            </div>
+            <p className="text-sm font-semibold text-brand-text-primary mb-1">No Events Found</p>
+            <p className="text-xs text-brand-text-muted max-w-[240px]">
+              {search ? 'Try a different search term.' : 'No events match the selected filter.'}
+            </p>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <DashboardCard>
