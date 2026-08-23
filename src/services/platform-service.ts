@@ -1537,6 +1537,10 @@ export const platformService = {
     await getApiClient().post(API.ENDPOINTS.PLATFORM.SUPPORT_TICKET_ACCEPT(id));
   },
 
+  async decideAppeal(id: string, decision: string, note?: string): Promise<void> {
+    await getApiClient().post(API.ENDPOINTS.PLATFORM.SUPPORT_TICKET_APPEAL_DECISION(id), { decision, note });
+  },
+
   async getSupportAnalytics(): Promise<Record<string, any>> {
     const { data } = await getApiClient().get<unknown>(API.ENDPOINTS.PLATFORM.SUPPORT_ANALYTICS);
     return (data as any).data ?? data;

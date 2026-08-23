@@ -571,7 +571,7 @@ export default function CreateEvent() {
       </div>
 
       {/* ===== STEP INDICATOR ===== */}
-      <div className="flex items-center gap-0.5 overflow-x-auto pb-1 flex-nowrap">
+      <div className="flex items-center gap-0.5 flex-wrap pb-1">
         {STEP_LABELS.map((label, i) => {
           const idx = i + 1
           const isActive = idx === step

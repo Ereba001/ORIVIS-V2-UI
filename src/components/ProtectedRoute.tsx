@@ -6,7 +6,7 @@ export default function ProtectedRoute() {
   const { isAuthenticated, isLoading, user } = useAuth();
 
   if (isLoading) {
-    return <LoadingOverlay messages={['Loading your session...']} />;
+    return <LoadingOverlay showLogo={false} messages={['Loading your session...']} />;
   }
 
   if (!isAuthenticated) {

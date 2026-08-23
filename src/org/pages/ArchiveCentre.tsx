@@ -171,7 +171,7 @@ export default function OrgArchiveCentre() {
               style={{ '--tw-ring-color': branding.primaryColor } as React.CSSProperties}
             />
           </div>
-          <div className="flex items-center gap-1 bg-brand-surface-elevated rounded-xl p-0.5 max-w-full overflow-x-auto">
+          <div className="flex flex-wrap items-center gap-1 bg-brand-surface-elevated rounded-xl p-0.5 max-w-full">
             {(['all', 'completed', 'cancelled', 'expired'] as ReasonFilter[]).map((filter) => (
               <button
                 key={filter}

@@ -127,6 +127,23 @@ export default function OrgTeam() {
     }
   }, [data, inviteRole])
 
+  const handleDeleteRole = useCallback((role: Role) => {
+    setDeleteRoleTarget(role)
+  }, [])
+
+  const handleCloneRole = useCallback((role: Role) => {
+    setCloneRoleTarget(role)
+    setCloneRoleName(`${role.name} (copy)`)
+  }, [])
+
+  const handleBulkDelete = useCallback(() => {
+    setBulkRemoveTarget(true)
+  }, [])
+
+  const handleRemoveMember = useCallback((id: string, name: string) => {
+    setRemoveMemberTarget({ id, name })
+  }, [])
+
   if (loading) {
     return (
       <>
@@ -283,10 +300,6 @@ export default function OrgTeam() {
     }
   }
 
-  const handleDeleteRole = useCallback((role: Role) => {
-    setDeleteRoleTarget(role)
-  }, [])
-
   const confirmDeleteRole = async () => {
     if (!deleteRoleTarget) return
     setBusyRoleId(deleteRoleTarget.id)
@@ -300,11 +313,6 @@ export default function OrgTeam() {
       setBusyRoleId(null)
     }
   }
-
-  const handleCloneRole = useCallback((role: Role) => {
-    setCloneRoleTarget(role)
-    setCloneRoleName(`${role.name} (copy)`)
-  }, [])
 
   const confirmCloneRole = async () => {
     if (!cloneRoleTarget) return
@@ -320,10 +328,6 @@ export default function OrgTeam() {
     }
   }
 
-  const handleBulkDelete = useCallback(() => {
-    setBulkRemoveTarget(true)
-  }, [])
-
   const confirmBulkDelete = async () => {
     setBulkRemoveTarget(false)
     const ids = Array.from(selectedIds)
@@ -333,10 +337,6 @@ export default function OrgTeam() {
     setSelectedIds(new Set())
     reload()
   }
-
-  const handleRemoveMember = useCallback((id: string, name: string) => {
-    setRemoveMemberTarget({ id, name })
-  }, [])
 
   const confirmRemoveMember = async () => {
     if (!removeMemberTarget) return

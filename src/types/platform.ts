@@ -48,6 +48,8 @@ export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
 export type TicketStatus = 'OPEN' | 'ASSIGNED' | 'ACCEPTED' | 'WAITING' | 'RESOLVED' | 'CLOSED'
 export type TicketCategory = 'TECHNICAL' | 'BILLING' | 'ACCOUNT' | 'FEATURE_REQUEST' | 'BUG_REPORT' | 'SECURITY' | 'SUSPENSION_APPEAL' | 'OTHER'
 
+export type AppealDecision = 'pending' | 'upheld' | 'lifted' | 'request_more_info' | 'escalated'
+
 export interface SupportTicket {
   id: UUID
   subject: string
@@ -57,6 +59,10 @@ export interface SupportTicket {
   category: TicketCategory
   organizationName: string
   organizationId: UUID
+  appealDecision?: AppealDecision | null
+  appealDecisionNote?: string | null
+  appealDecidedAt?: string | null
+  appealDecidedByName?: string | null
   assignedTo: UUID | null
   assignedToName: string | null
   acceptedBy: UUID | null

@@ -95,7 +95,7 @@ function OrgLogoAvatar({ branding, className = '', iconClassName = 'text-[10px]'
 export default function OrgLayout() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { branding, admin, isLoaded, status: brandingStatus, retry: retryBranding, assistedEventsEnabled } = useOrgBranding()
+  const { branding, admin, isLoaded, status: brandingStatus, retry: retryBranding, assistedEventsEnabled, suspensionReason } = useOrgBranding()
   const { logout } = useAuth()
   const {
     notifications: ORG_NOTIFICATIONS,
@@ -230,6 +230,71 @@ export default function OrgLayout() {
   }
 
   const canIntervene = hasPermission('intervene')
+
+  // ── Suspended / Closed: bypass the entire normal shell ──────────
+  // When the organization is suspended or closed, render only the
+  // dedicated screen (or the support page with minimal chrome).
+  // No sidebar, header, navigation, search, or dashboard elements.
+  const orgStatus = branding.organizationStatus
+  const isSuspended = orgStatus === 'suspended'
+  const isClosed = orgStatus === 'closed'
+  const isRestricted = isSuspended || isClosed
+  const isHelpRoute = location.pathname === '/org/help'
+
+  if (isLoaded && isRestricted) {
+    return (
+      <div className="min-h-screen bg-brand-bg" data-org-theme={orgTheme}>
+        <style>{`
+          :root {
+            --org-primary: ${branding.primaryColor};
+            --org-secondary: ${branding.secondaryColor};
+            --org-accent: ${branding.accentColor};
+          }
+        `}</style>
+        {isHelpRoute ? (
+          /* Minimal shell for support page during suspension/closure */
+          <div className="min-h-screen flex flex-col">
+            <header className="bg-brand-surface border-b border-brand-divider sticky top-0 z-20">
+              <div className="flex items-center justify-between h-14 px-4 lg:px-6 max-w-5xl mx-auto">
+                <div className="flex items-center gap-3">
+                  <OrgLogoAvatar branding={branding} className="w-8 h-8" iconClassName="text-[10px]" />
+                  <div>
+                    <p className="text-sm font-bold text-brand-text-primary leading-tight">{branding.organizationName}</p>
+                    <p className="text-[10px] text-brand-text-muted">Support Centre</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => navigate('/org/signin')}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold text-brand-text-muted hover:bg-brand-surface-interactive border border-brand-border transition-colors"
+                >
+                  <LogOut size={12} /> Sign Out
+                </button>
+              </div>
+            </header>
+            <main className="flex-1 p-4 lg:p-6 xl:p-8 max-w-5xl mx-auto w-full">
+              <Outlet />
+            </main>
+          </div>
+        ) : (
+          /* Suspended or Closed full-screen screen */
+          isSuspended ? (
+            <WorkspaceSuspended
+              organizationName={branding.organizationName}
+              logoUrl={branding.logoUrl}
+              primaryColor={branding.primaryColor}
+              reason={suspensionReason ?? undefined}
+            />
+          ) : (
+            <WorkspaceClosed
+              organizationName={branding.organizationName}
+              logoUrl={branding.logoUrl}
+              primaryColor={branding.primaryColor}
+            />
+          )
+        )}
+      </div>
+    )
+  }
 
   return (
     <div className="org-shell min-h-screen bg-brand-bg flex" data-org-theme={orgTheme}>
@@ -867,13 +932,7 @@ export default function OrgLayout() {
           className={`flex-1 p-4 lg:p-6 xl:p-8 overflow-x-auto ${isInspection ? 'pt-24' : ''}`}
           role="main"
         >
-          {branding.organizationStatus === 'closed' ? (
-            <WorkspaceClosed organizationName={branding.organizationName} />
-          ) : branding.organizationStatus === 'suspended' ? (
-            <WorkspaceSuspended organizationName={branding.organizationName} />
-          ) : (
-            <Outlet />
-          )}
+          <Outlet />
         </main>
       </div>
     </div>

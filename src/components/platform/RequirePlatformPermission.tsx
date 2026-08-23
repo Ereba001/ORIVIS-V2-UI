@@ -29,7 +29,7 @@ export default function RequirePlatformPermission({ permission, children }: Prop
   }
 
   if (!permissionsLoaded) {
-    return <LoadingOverlay messages={['Checking permissions...']} />
+    return <LoadingOverlay showLogo={false} messages={['Checking permissions...']} />
   }
 
   const allowed = Array.isArray(permission) ? hasAnyPermission(...permission) : hasPermission(permission)

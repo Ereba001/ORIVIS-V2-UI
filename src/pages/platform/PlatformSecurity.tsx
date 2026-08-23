@@ -411,7 +411,7 @@ export default function PlatformSecurity() {
               <StatCard label="Active Orgs" value={dashboard.active_organizations} icon={Building2} color="text-status-info" />
             </div>
             {activityGraph && <ActivityGraph buckets={activityGraph.buckets} total={activityGraph.total} periodMinutes={activityGraph.period_minutes} />}
-            <div className="flex items-center gap-1 p-1 bg-brand-surface rounded-xl border border-brand-divider">
+            <div className="flex flex-wrap items-center gap-1 p-1 bg-brand-surface rounded-xl border border-brand-divider">
               {[{ key: "stream" as const, label: "Live Stream", icon: Activity }, { key: "incidents" as const, label: "Incidents", icon: AlertOctagon }, { key: "alerts" as const, label: "Alerts", icon: Bell }, { key: "organizations" as const, label: "Orgs", icon: Building2 }].map((tab) => (
                 <button key={tab.key} onClick={() => setActiveTab(tab.key)} className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer ${activeTab === tab.key ? "bg-brand-bg-elevated text-brand-text-primary shadow-sm" : "text-brand-text-muted hover:text-brand-text-secondary"}`}><tab.icon size={12} />{tab.label}</button>
               ))}

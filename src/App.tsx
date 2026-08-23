@@ -98,7 +98,7 @@ const OrgAssistedElectionCentre = lazy(() => import("./org/pages/AssistedElectio
 
 function SuspenseWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<LoadingOverlay messages={["Loading page..."]} />}>
+    <Suspense fallback={<LoadingOverlay showLogo={false} messages={["Loading page..."]} />}>
       {children}
     </Suspense>
   );

@@ -444,7 +444,7 @@ export default function PlatformMonitoring() {
             </div>
 
             {/* Tab navigation */}
-            <div className="flex items-center gap-1 border-b border-brand-divider">
+            <div className="flex flex-wrap items-center gap-1 border-b border-brand-divider">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}

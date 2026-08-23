@@ -243,6 +243,7 @@ export const API = {
       SUPPORT_TICKET: (id: string) => `/platform/support/tickets/${id}`,
       SUPPORT_TICKET_REPLY: (id: string) => `/platform/support/tickets/${id}/reply`,
       SUPPORT_TICKET_ACCEPT: (id: string) => `/platform/support/tickets/${id}/accept`,
+      SUPPORT_TICKET_APPEAL_DECISION: (id: string) => `/platform/support/tickets/${id}/appeal-decision`,
       SUPPORT_TICKET_UPDATE: (id: string) => `/platform/support/tickets/${id}`,
       SUPPORT_UPLOAD: '/platform/support/upload',
       SUPPORT_ANALYTICS: '/platform/support/analytics',

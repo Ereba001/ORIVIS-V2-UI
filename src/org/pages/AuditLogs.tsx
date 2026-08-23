@@ -222,8 +222,8 @@ export default function OrgAuditLogs() {
         </DashboardCard>
       ) : (
         <div className="space-y-6">
-          {pagedEntries.map(({ date, events }) => (
-            <div key={date}>
+          {pagedEntries.map(({ date, events }, idx) => (
+            <div key={`${date}-${idx}`}>
               <div className="flex items-center gap-2 mb-3">
                 <Calendar size={14} style={{ color: pColor }} />
                 <h3 className="text-xs font-bold " style={{ color: pColor }}>{date}</h3>

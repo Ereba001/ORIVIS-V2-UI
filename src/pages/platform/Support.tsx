@@ -4,7 +4,12 @@ import {
   Search, X, Send, MessageSquare, FileText,
   BookOpen, ChevronDown, User, Clock, AlertCircle,
   AlertTriangle, RefreshCw, CheckCircle, Paperclip, Image as ImageIcon,
+  BarChart3, TrendingUp, Timer, ShieldAlert, Inbox, Users, CheckCircle2, Target,
 } from "lucide-react"
+import {
+  ResponsiveContainer, PieChart, Pie, Cell, Tooltip,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid,
+} from "recharts"
 import SeoHead from "../../components/SeoHead"
 import Breadcrumbs from "../../components/platform/Breadcrumbs"
 import PageHeader from "../../components/platform/PageHeader"
@@ -42,6 +47,7 @@ const CATEGORY_COLORS: Record<TicketCategory, string> = {
   ACCOUNT: "bg-status-info/10 text-status-info border-status-info/20",
   FEATURE_REQUEST: "bg-status-info/10 text-status-info border-status-info/20",
   BUG_REPORT: "bg-status-danger/10 text-status-danger border-status-danger/20",
+  SECURITY: "bg-status-danger/10 text-status-danger border-status-danger/20",
   SUSPENSION_APPEAL: "bg-status-error/10 text-status-error border-status-error/20",
   OTHER: "bg-brand-surface-interactive text-brand-text-muted border-brand-border",
 }
@@ -155,7 +161,7 @@ export default function PlatformSupportCentre() {
   const [priorityFilter, setPriorityFilter] = useState("all")
   const [categoryFilter, setCategoryFilter] = useState("all")
   const [selectedTicket, setSelectedTicket] = useState<SupportTicket | null>(null)
-  const [activeSection, setActiveSection] = useState<"tickets" | "knowledge">("tickets")
+  const [activeSection, setActiveSection] = useState<"tickets" | "analytics" | "knowledge">("tickets")
   const [replyText, setReplyText] = useState("")
   const [expandedArticle, setExpandedArticle] = useState<string | null>(null)
   const [sendingReply, setSendingReply] = useState(false)
@@ -417,26 +423,10 @@ export default function PlatformSupportCentre() {
 
       <StatsGrid items={statsItems} />
 
-      {/* ── Analytics Dashboard ── */}
-      {analytics && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          {[
-            { label: 'Avg First Response', value: analytics.avg_first_response_minutes != null ? `${Math.round(analytics.avg_first_response_minutes)}m` : 'N/A', color: 'text-brand-text-primary' },
-            { label: 'Avg Resolution', value: analytics.avg_resolution_minutes != null ? `${Math.round(analytics.avg_resolution_minutes)}m` : 'N/A', color: 'text-brand-text-primary' },
-            { label: 'SLA Breaches', value: String((analytics.sla_first_response_breaches || 0) + (analytics.sla_resolution_breaches || 0)), color: ((analytics.sla_first_response_breaches || 0) + (analytics.sla_resolution_breaches || 0)) > 0 ? 'text-status-error' : 'text-status-success' },
-            { label: 'Unassigned', value: String(analytics.unassigned || 0), color: (analytics.unassigned || 0) > 0 ? 'text-status-warning' : 'text-status-success' },
-            { label: 'Suspended Appeals', value: String(analytics.suspended_org_requests || 0), color: (analytics.suspended_org_requests || 0) > 0 ? 'text-status-error' : 'text-status-success' },
-          ].map((item) => (
-            <div key={item.label} className="glass-card rounded-2xl p-3">
-              <div className="text-[9px] font-mono uppercase tracking-widest text-brand-text-muted font-bold mb-1">{item.label}</div>
-              <div className={`text-lg font-bold ${item.color}`}>{item.value}</div>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Analytics section rendered below the section switcher */}
 
       <div className="flex items-center gap-1.5 p-1 bg-brand-surface-elevated rounded-2xl w-fit">
-        {(["tickets", "knowledge"] as const).map((section) => (
+        {(["tickets", "analytics", "knowledge"] as const).map((section) => (
           <button
             key={section}
             onClick={() => setActiveSection(section)}
@@ -448,8 +438,8 @@ export default function PlatformSupportCentre() {
               <motion.span layoutId="support-section-bg" className="absolute inset-0 bg-brand-gold rounded-xl" transition={{ type: "spring", stiffness: 380, damping: 30 }} />
             )}
             <span className="relative z-10 flex items-center gap-2">
-              {section === "tickets" ? <MessageSquare size={12} /> : <BookOpen size={12} />}
-              {section === "tickets" ? "Tickets" : "Knowledge Base"}
+              {section === "tickets" ? <MessageSquare size={12} /> : section === "analytics" ? <BarChart3 size={12} /> : <BookOpen size={12} />}
+              {section === "tickets" ? "Tickets" : section === "analytics" ? "Analytics" : "Knowledge Base"}
             </span>
           </button>
         ))}
@@ -525,6 +515,181 @@ export default function PlatformSupportCentre() {
             </div>
           )}
         </>
+      ) : activeSection === "analytics" ? (
+        /* ── Analytics Dashboard ── */
+        analyticsLoading ? (
+          <div className="bg-brand-surface border border-brand-border rounded-2xl p-10 flex flex-col items-center justify-center text-center">
+            <div className="w-8 h-8 border-2 border-brand-text-muted border-t-transparent rounded-full animate-spin mb-3" />
+            <p className="text-xs text-brand-text-muted">Loading analytics...</p>
+          </div>
+        ) : analytics ? (
+          <div className="space-y-5">
+            {/* Summary Cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              {[
+                { label: 'Total Tickets', value: analytics.total || 0, icon: Inbox, color: 'text-brand-text-primary', bgColor: 'bg-brand-surface-elevated' },
+                { label: 'Active', value: analytics.active || 0, icon: Clock, color: 'text-status-info', bgColor: 'bg-status-info/10' },
+                { label: 'Resolved Today', value: analytics.resolved_today || 0, icon: CheckCircle2, color: 'text-status-success', bgColor: 'bg-status-success/10' },
+                { label: 'Created Today', value: analytics.created_today || 0, icon: TrendingUp, color: 'text-status-info', bgColor: 'bg-status-info/10' },
+                { label: 'Unassigned', value: analytics.unassigned || 0, icon: Users, color: (analytics.unassigned || 0) > 0 ? 'text-status-warning' : 'text-status-success', bgColor: (analytics.unassigned || 0) > 0 ? 'bg-status-warning/10' : 'bg-status-success/10' },
+                { label: 'Suspended Appeals', value: analytics.suspended_org_requests || 0, icon: ShieldAlert, color: (analytics.suspended_org_requests || 0) > 0 ? 'text-status-error' : 'text-status-success', bgColor: (analytics.suspended_org_requests || 0) > 0 ? 'bg-status-error/10' : 'bg-status-success/10' },
+              ].map((item) => (
+                <div key={item.label} className="glass-card rounded-2xl p-4">
+                  <div className="flex items-start justify-between mb-2">
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${item.bgColor}`}>
+                      <item.icon size={14} className={item.color} />
+                    </div>
+                  </div>
+                  <div className="text-xl font-bold text-brand-text-primary">{item.value}</div>
+                  <div className="text-[9px] font-mono uppercase tracking-widest text-brand-text-muted font-bold mt-1">{item.label}</div>
+                </div>
+              ))}
+            </div>
+
+            {/* Charts Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              {/* Status Distribution */}
+              <div className="bg-brand-surface border border-brand-border rounded-2xl p-4">
+                <h3 className="text-[10px] font-mono uppercase tracking-widest text-brand-text-muted font-bold mb-3">Status Distribution</h3>
+                {(() => {
+                  const statusData = Object.entries(analytics.status_counts || {}).map(([key, val]) => ({
+                    name: key.charAt(0).toUpperCase() + key.slice(1).replace('_', ' '),
+                    value: val as number,
+                    color: key === 'open' ? '#f59e0b' : key === 'assigned' ? '#3b82f6' : key === 'accepted' ? '#6366f1' : key === 'in_progress' ? '#8b5cf6' : key === 'waiting' ? '#94a3b8' : key === 'resolved' ? '#22c55e' : '#64748b',
+                  }))
+                  const total = statusData.reduce((sum, d) => sum + d.value, 0)
+                  if (total === 0) return <p className="text-xs text-brand-text-muted text-center py-8">No data</p>
+                  return (
+                    <div className="flex flex-col items-center">
+                      <div className="h-40 w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <PieChart>
+                            <Pie data={statusData} dataKey="value" nameKey="name" cx="50%" cy="50%" innerRadius={36} outerRadius={60} paddingAngle={3} stroke="none">
+                              {statusData.map((entry, i) => <Cell key={i} fill={entry.color} />)}
+                            </Pie>
+                            <Tooltip contentStyle={{ backgroundColor: 'var(--color-brand-surface)', border: '1px solid var(--color-brand-border)', borderRadius: 10, color: 'var(--color-brand-text-primary)', fontSize: 12 }} />
+                          </PieChart>
+                        </ResponsiveContainer>
+                      </div>
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-1 mt-2 w-full">
+                        {statusData.map((d) => (
+                          <div key={d.name} className="flex items-center gap-2 text-[10px]">
+                            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: d.color }} />
+                            <span className="text-brand-text-muted truncate">{d.name}</span>
+                            <span className="ml-auto font-mono font-bold text-brand-text-primary">{d.value}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })()}
+              </div>
+
+              {/* Priority Distribution */}
+              <div className="bg-brand-surface border border-brand-border rounded-2xl p-4">
+                <h3 className="text-[10px] font-mono uppercase tracking-widest text-brand-text-muted font-bold mb-3">Priority (Open Tickets)</h3>
+                {(() => {
+                  const priorityData = [
+                    { name: 'Urgent', value: (analytics.priority_counts as any)?.urgent || 0, color: '#ef4444' },
+                    { name: 'High', value: (analytics.priority_counts as any)?.high || 0, color: '#f97316' },
+                    { name: 'Medium', value: (analytics.priority_counts as any)?.medium || 0, color: '#3b82f6' },
+                    { name: 'Low', value: (analytics.priority_counts as any)?.low || 0, color: '#94a3b8' },
+                  ]
+                  const maxVal = Math.max(1, ...priorityData.map(d => d.value))
+                  return (
+                    <div className="space-y-3 mt-2">
+                      {priorityData.map((d) => (
+                        <div key={d.name}>
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="text-[10px] font-semibold text-brand-text-primary">{d.name}</span>
+                            <span className="text-[10px] font-mono font-bold text-brand-text-primary">{d.value}</span>
+                          </div>
+                          <div className="h-2 bg-brand-surface-elevated rounded-full overflow-hidden">
+                            <div className="h-full rounded-full transition-all duration-500" style={{ width: `${(d.value / maxVal) * 100}%`, backgroundColor: d.color }} />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )
+                })()}
+              </div>
+
+              {/* SLA Performance */}
+              <div className="bg-brand-surface border border-brand-border rounded-2xl p-4">
+                <h3 className="text-[10px] font-mono uppercase tracking-widest text-brand-text-muted font-bold mb-3">SLA Performance</h3>
+                <div className="space-y-4 mt-2">
+                  {/* First Response */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <Timer size={12} className="text-brand-text-muted" />
+                      <span className="text-[10px] font-semibold text-brand-text-primary">Avg First Response</span>
+                    </div>
+                    <div className="text-xl font-bold text-brand-text-primary">
+                      {analytics.avg_first_response_minutes != null ? `${Math.round(analytics.avg_first_response_minutes)}m` : 'N/A'}
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <span className="text-[9px] font-mono text-brand-text-muted">Breaches:</span>
+                      <span className={`text-[9px] font-mono font-bold ${(analytics.sla_first_response_breaches || 0) > 0 ? 'text-status-error' : 'text-status-success'}`}>
+                        {analytics.sla_first_response_breaches || 0}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="border-t border-brand-divider" />
+                  {/* Resolution */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <Target size={12} className="text-brand-text-muted" />
+                      <span className="text-[10px] font-semibold text-brand-text-primary">Avg Resolution</span>
+                    </div>
+                    <div className="text-xl font-bold text-brand-text-primary">
+                      {analytics.avg_resolution_minutes != null ? `${Math.round(analytics.avg_resolution_minutes)}m` : 'N/A'}
+                    </div>
+                    <div className="flex items-center gap-1.5 mt-1">
+                      <span className="text-[9px] font-mono text-brand-text-muted">Breaches:</span>
+                      <span className={`text-[9px] font-mono font-bold ${(analytics.sla_resolution_breaches || 0) > 0 ? 'text-status-error' : 'text-status-success'}`}>
+                        {analytics.sla_resolution_breaches || 0}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="border-t border-brand-divider" />
+                  {/* Total Breaches */}
+                  <div className="text-center">
+                    <div className={`text-2xl font-bold ${((analytics.sla_first_response_breaches || 0) + (analytics.sla_resolution_breaches || 0)) > 0 ? 'text-status-error' : 'text-status-success'}`}>
+                      {(analytics.sla_first_response_breaches || 0) + (analytics.sla_resolution_breaches || 0)}
+                    </div>
+                    <div className="text-[9px] font-mono uppercase tracking-widest text-brand-text-muted font-bold">Total SLA Breaches</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Category Breakdown Bar Chart */}
+            {Object.keys(analytics.category_counts || {}).length > 0 && (
+              <div className="bg-brand-surface border border-brand-border rounded-2xl p-4">
+                <h3 className="text-[10px] font-mono uppercase tracking-widest text-brand-text-muted font-bold mb-3">Tickets by Category (Last 30 Days)</h3>
+                <div className="h-56">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={Object.entries(analytics.category_counts || {}).map(([key, val]) => ({
+                      name: key.replace('_', ' ').replace(/\b\w/g, c => c.toUpperCase()),
+                      count: val as number,
+                    })).sort((a, b) => b.count - a.count)} layout="vertical" margin={{ top: 0, right: 8, left: 0, bottom: 0 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="var(--color-brand-border)" horizontal={false} />
+                      <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fontFamily: 'Inter', fill: 'var(--color-brand-text-muted)' }} tickLine={false} axisLine={false} />
+                      <YAxis type="category" dataKey="name" width={110} tick={{ fontSize: 11, fontFamily: 'Inter', fill: 'var(--color-brand-text-muted)' }} tickLine={false} axisLine={false} />
+                      <Tooltip contentStyle={{ backgroundColor: 'var(--color-brand-surface)', border: '1px solid var(--color-brand-border)', borderRadius: 10, color: 'var(--color-brand-text-primary)', fontSize: 12 }} />
+                      <Bar dataKey="count" name="Tickets" fill="var(--color-brand-gold)" radius={[0, 6, 6, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="bg-brand-surface border border-brand-border rounded-2xl p-10 flex flex-col items-center justify-center text-center">
+            <BarChart3 size={32} className="text-brand-text-disabled mb-3" />
+            <p className="text-xs text-brand-text-muted">No analytics data available yet.</p>
+          </div>
+        )
       ) : (
         <div className="space-y-4">
           <div className="relative max-w-md">
@@ -632,6 +797,67 @@ export default function PlatformSupportCentre() {
                     {staffList.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
                   </select>
                 </div>
+
+                {/* Suspension Appeal Decision Panel */}
+                {selectedTicket.category === 'SUSPENSION_APPEAL' && (
+                  <div className="border-t border-brand-divider pt-3 mt-1">
+                    <div className="text-[9px] font-mono uppercase tracking-widest text-brand-text-muted font-bold mb-2">Appeal Decision</div>
+                    {(selectedTicket as any).appealDecision && (selectedTicket as any).appealDecision !== 'pending' ? (
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full ${(selectedTicket as any).appealDecision === 'lifted' ? 'bg-status-success/10 text-status-success border border-status-success/20' : (selectedTicket as any).appealDecision === 'upheld' ? 'bg-status-error/10 text-status-error border border-status-error/20' : 'bg-status-info/10 text-status-info border border-status-info/20'}`}>
+                            {(selectedTicket as any).appealDecision === 'lifted' ? 'LIFTED' : (selectedTicket as any).appealDecision === 'upheld' ? 'UPHELD' : (selectedTicket as any).appealDecision === 'request_more_info' ? 'INFO REQUESTED' : 'ESCALATED'}
+                          </span>
+                          <span className="text-[9px] text-brand-text-muted">by {(selectedTicket as any).appealDecidedByName || 'Admin'}</span>
+                        </div>
+                        {(selectedTicket as any).appealDecisionNote && (
+                          <p className="text-[10px] text-brand-text-secondary bg-brand-surface-elevated/50 border border-brand-divider rounded-lg px-3 py-2">{(selectedTicket as any).appealDecisionNote}</p>
+                        )}
+                        {(selectedTicket as any).appealDecision === 'lifted' && (
+                          <p className="text-[10px] text-status-success">Organization has been reactivated.</p>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <p className="text-[10px] text-brand-text-muted mb-2">Review the suspension and make a decision:</p>
+                        <div className="grid grid-cols-2 gap-2">
+                          <button onClick={async () => {
+                            const note = window.prompt('Decision note (optional):')
+                            await platformService.decideAppeal(selectedTicket.id, 'lifted', note || undefined)
+                            await reloadTicket(selectedTicket.id)
+                            load()
+                          }} className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-status-success/10 border border-status-success/20 text-status-success text-[10px] font-bold hover:bg-status-success/20 transition-all cursor-pointer">
+                            Lift Suspension
+                          </button>
+                          <button onClick={async () => {
+                            const note = window.prompt('Decision note (optional):')
+                            await platformService.decideAppeal(selectedTicket.id, 'upheld', note || undefined)
+                            await reloadTicket(selectedTicket.id)
+                            load()
+                          }} className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-status-error/10 border border-status-error/20 text-status-error text-[10px] font-bold hover:bg-status-error/20 transition-all cursor-pointer">
+                            Uphold
+                          </button>
+                          <button onClick={async () => {
+                            const note = window.prompt('What information do you need?')
+                            if (note) await platformService.decideAppeal(selectedTicket.id, 'request_more_info', note)
+                            await reloadTicket(selectedTicket.id)
+                            load()
+                          }} className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-status-info/10 border border-status-info/20 text-status-info text-[10px] font-bold hover:bg-status-info/20 transition-all cursor-pointer">
+                            Request Info
+                          </button>
+                          <button onClick={async () => {
+                            const note = window.prompt('Escalation note (optional):')
+                            await platformService.decideAppeal(selectedTicket.id, 'escalated', note || undefined)
+                            await reloadTicket(selectedTicket.id)
+                            load()
+                          }} className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-400 text-[10px] font-bold hover:bg-orange-500/20 transition-all cursor-pointer">
+                            Escalate
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* ── Messages — Side-by-side chat ── */}

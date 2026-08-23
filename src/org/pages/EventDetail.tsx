@@ -530,7 +530,7 @@ export default function EventDetail() {
       )}
 
       {/* TABS */}
-      <div className="flex overflow-x-auto flex-nowrap items-center gap-1 bg-brand-surface-elevated rounded-xl p-1">
+      <div className="flex flex-wrap items-center gap-1 bg-brand-surface-elevated rounded-xl p-1">
         {visibleTabs.map((t) => {
           const TabIcon = t.icon
           return (
