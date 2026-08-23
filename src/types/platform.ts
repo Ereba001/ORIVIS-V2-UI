@@ -46,7 +46,7 @@ export interface PlatformRole {
 // --- Support Tickets ---
 export type TicketPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT'
 export type TicketStatus = 'OPEN' | 'ASSIGNED' | 'ACCEPTED' | 'WAITING' | 'RESOLVED' | 'CLOSED'
-export type TicketCategory = 'TECHNICAL' | 'BILLING' | 'ACCOUNT' | 'FEATURE_REQUEST' | 'BUG_REPORT' | 'OTHER'
+export type TicketCategory = 'TECHNICAL' | 'BILLING' | 'ACCOUNT' | 'FEATURE_REQUEST' | 'BUG_REPORT' | 'SECURITY' | 'SUSPENSION_APPEAL' | 'OTHER'
 
 export interface SupportTicket {
   id: UUID

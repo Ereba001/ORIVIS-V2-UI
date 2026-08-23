@@ -39,6 +39,8 @@ const STATUS_CONFIG: Record<string, { label: string; color: string; Icon: typeof
 const CATEGORY_OPTIONS = [
   { value: 'technical', label: 'Technical Issue' },
   { value: 'billing', label: 'Account & Billing' },
+  { value: 'security', label: 'Security Concern' },
+  { value: 'suspension_appeal', label: 'Suspension Appeal' },
   { value: 'feature_request', label: 'Feature Request' },
   { value: 'other', label: 'General Inquiry' },
 ]
@@ -130,21 +132,32 @@ export default function LiveChat({ open, onClose }: LiveChatProps) {
 
   useEffect(() => {
     if (!activeTicket || view !== 'chat') return
+    let lastMessageAt: string | null = activeTicket.messages.length > 0
+      ? activeTicket.messages[activeTicket.messages.length - 1].createdAt
+      : null
     const interval = setInterval(async () => {
       try {
-        const updated = await orgService.getSupportTicket(activeTicket.uuid)
+        const sinceParam = lastMessageAt ? `?since=${encodeURIComponent(lastMessageAt)}` : ''
+        const updated = await orgService.getSupportTicket(activeTicket.uuid + sinceParam)
         if (updated) {
           setActiveTicket((prev) => {
             if (!prev) return null
+            const newMessages = mapMessages(updated.messages ?? [], updated.user_id)
+            // Merge: keep existing, add new ones (delta polling returns only new messages)
+            const existingIds = new Set(prev.messages.map(m => m.id))
+            const merged = [...prev.messages, ...newMessages.filter(m => !existingIds.has(m.id))]
+            if (newMessages.length > 0) {
+              lastMessageAt = merged[merged.length - 1].createdAt
+            }
             return {
               ...prev,
               status: updated.status,
-              messages: mapMessages(updated.messages ?? [], updated.user_id),
+              messages: merged,
             }
           })
         }
       } catch { /* ignore */ }
-    }, 10000)
+    }, 3000)
     return () => clearInterval(interval)
   }, [activeTicket?.uuid, view])
 

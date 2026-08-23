@@ -1499,9 +1499,13 @@ export const platformService = {
     return { items: items.map(mapTicket), total: res.meta?.total ?? items.length, page: res.meta?.current_page ?? 1, perPage: res.meta?.per_page ?? 50 };
   },
 
-  async getSupportTicket(id: string): Promise<SupportTicket | null> {
+  async getSupportTicket(idOrIdWithQuery: string): Promise<SupportTicket | null> {
     return readOrNull(async () => {
-      const { data } = await getApiClient().get<unknown>(API.ENDPOINTS.PLATFORM.SUPPORT_TICKET(id));
+      const parts = idOrIdWithQuery.split('?');
+      const id = parts[0];
+      const params = parts[1] ? new URLSearchParams(parts[1]) : undefined;
+      const url = API.ENDPOINTS.PLATFORM.SUPPORT_TICKET(id);
+      const { data } = await getApiClient().get<unknown>(url, params ? { params: Object.fromEntries(params) } : undefined);
       return mapTicket(unwrapPayload<RawSupportTicket>(data));
     });
   },
@@ -1531,6 +1535,11 @@ export const platformService = {
 
   async acceptSupportTicket(id: string): Promise<void> {
     await getApiClient().post(API.ENDPOINTS.PLATFORM.SUPPORT_TICKET_ACCEPT(id));
+  },
+
+  async getSupportAnalytics(): Promise<Record<string, any>> {
+    const { data } = await getApiClient().get<unknown>(API.ENDPOINTS.PLATFORM.SUPPORT_ANALYTICS);
+    return (data as any).data ?? data;
   },
 
   // --- Reports ---

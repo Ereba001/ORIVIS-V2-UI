@@ -696,9 +696,13 @@ export const orgService = {
     return { items, total: res.meta?.total ?? items.length };
   },
 
-  async getSupportTicket(uuid: string): Promise<RawSupportTicket | null> {
+  async getSupportTicket(uuidOrUuidWithQuery: string): Promise<RawSupportTicket | null> {
     return readOrNull(async () => {
-      const { data } = await getApiClient().get<unknown>(API.ENDPOINTS.ORG.SUPPORT_TICKET(uuid));
+      const parts = uuidOrUuidWithQuery.split('?');
+      const uuid = parts[0];
+      const params = parts[1] ? new URLSearchParams(parts[1]) : undefined;
+      const url = API.ENDPOINTS.ORG.SUPPORT_TICKET(uuid);
+      const { data } = await getApiClient().get<unknown>(url, params ? { params: Object.fromEntries(params) } : undefined);
       return unwrapPayload<RawSupportTicket>(data);
     });
   },

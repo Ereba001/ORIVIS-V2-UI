@@ -245,6 +245,7 @@ export const API = {
       SUPPORT_TICKET_ACCEPT: (id: string) => `/platform/support/tickets/${id}/accept`,
       SUPPORT_TICKET_UPDATE: (id: string) => `/platform/support/tickets/${id}`,
       SUPPORT_UPLOAD: '/platform/support/upload',
+      SUPPORT_ANALYTICS: '/platform/support/analytics',
       APPROVE_ELECTION: (id: string) => `/platform/elections/${id}/approve`,
       REJECT_ELECTION: (id: string) => `/platform/elections/${id}/reject`,
       ELECTIONS: '/platform/elections',

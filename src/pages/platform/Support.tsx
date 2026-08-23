@@ -42,6 +42,7 @@ const CATEGORY_COLORS: Record<TicketCategory, string> = {
   ACCOUNT: "bg-status-info/10 text-status-info border-status-info/20",
   FEATURE_REQUEST: "bg-status-info/10 text-status-info border-status-info/20",
   BUG_REPORT: "bg-status-danger/10 text-status-danger border-status-danger/20",
+  SUSPENSION_APPEAL: "bg-status-error/10 text-status-error border-status-error/20",
   OTHER: "bg-brand-surface-interactive text-brand-text-muted border-brand-border",
 }
 
@@ -59,7 +60,8 @@ const CATEGORY_OPTIONS = [
   { value: "BILLING", label: "Billing" },
   { value: "ACCOUNT", label: "Account" },
   { value: "FEATURE_REQUEST", label: "Feature Request" },
-  { value: "BUG_REPORT", label: "Bug Report" },
+  { value: "SECURITY", label: "Security" },
+  { value: "SUSPENSION_APPEAL", label: "Suspension Appeal" },
   { value: "OTHER", label: "Other" },
 ]
 
@@ -158,6 +160,8 @@ export default function PlatformSupportCentre() {
   const [expandedArticle, setExpandedArticle] = useState<string | null>(null)
   const [sendingReply, setSendingReply] = useState(false)
   const [mutationError, setMutationError] = useState<string | null>(null)
+  const [analytics, setAnalytics] = useState<Record<string, any> | null>(null)
+  const [analyticsLoading, setAnalyticsLoading] = useState(false)
   const [staffList, setStaffList] = useState<PlatformStaff[]>([])
   const [pendingMedia, setPendingMedia] = useState<{ type: 'voice' | 'image' | 'file'; blob?: Blob; fileName?: string; fileSize?: number; fileType?: string; filePath?: string; duration?: number } | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -179,6 +183,8 @@ export default function PlatformSupportCentre() {
   useEffect(() => {
     load()
     platformService.getStaff({ perPage: 100 }).then((r) => setStaffList(r.items)).catch((err) => console.error('Support.getStaff:', err))
+    setAnalyticsLoading(true)
+    platformService.getSupportAnalytics().then((a) => { setAnalytics(a); setAnalyticsLoading(false) }).catch(() => setAnalyticsLoading(false))
   }, [])
 
   const reloadTicket = useCallback(async (uuid: string) => {
@@ -215,15 +221,37 @@ export default function PlatformSupportCentre() {
 
   useEffect(() => {
     if (!selectedTicket) return
+    let lastMessageAt: string | null = selectedTicket.messages && selectedTicket.messages.length > 0
+      ? selectedTicket.messages[selectedTicket.messages.length - 1].createdAt
+      : null
     const interval = setInterval(async () => {
       try {
-        const updated = await platformService.getSupportTicket(selectedTicket.id)
+        const sinceParam = lastMessageAt ? `?since=${encodeURIComponent(lastMessageAt)}` : ''
+        const updated = await platformService.getSupportTicket(selectedTicket.id + sinceParam)
         if (updated) {
-          setSelectedTicket(updated)
-          setTickets((prev) => prev.map((t) => t.id === selectedTicket.id ? updated : t))
+          setSelectedTicket((prev) => {
+            if (!prev) return updated
+            if (lastMessageAt) {
+              // Delta: merge new messages into existing list
+              const existingIds = new Set((prev.messages ?? []).map((m: any) => m.id))
+              const newMsgs = (updated.messages ?? []).filter((m: any) => !existingIds.has(m.id))
+              if (newMsgs.length > 0) {
+                updated.messages = [...(prev.messages ?? []), ...newMsgs]
+                lastMessageAt = updated.messages[updated.messages.length - 1].createdAt
+              } else {
+                updated.messages = prev.messages
+              }
+            } else {
+              lastMessageAt = updated.messages && updated.messages.length > 0
+                ? updated.messages[updated.messages.length - 1].createdAt
+                : null
+            }
+            return updated
+          })
+          setTickets((prev) => prev.map((t) => t.id === selectedTicket.id ? { ...t, status: updated.status } : t))
         }
       } catch (err) { console.error('Support.poll:', err) }
-    }, 10000)
+    }, 3000)
     return () => clearInterval(interval)
   }, [selectedTicket?.id])
 
@@ -388,6 +416,24 @@ export default function PlatformSupportCentre() {
       />
 
       <StatsGrid items={statsItems} />
+
+      {/* ── Analytics Dashboard ── */}
+      {analytics && (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          {[
+            { label: 'Avg First Response', value: analytics.avg_first_response_minutes != null ? `${Math.round(analytics.avg_first_response_minutes)}m` : 'N/A', color: 'text-brand-text-primary' },
+            { label: 'Avg Resolution', value: analytics.avg_resolution_minutes != null ? `${Math.round(analytics.avg_resolution_minutes)}m` : 'N/A', color: 'text-brand-text-primary' },
+            { label: 'SLA Breaches', value: String((analytics.sla_first_response_breaches || 0) + (analytics.sla_resolution_breaches || 0)), color: ((analytics.sla_first_response_breaches || 0) + (analytics.sla_resolution_breaches || 0)) > 0 ? 'text-status-error' : 'text-status-success' },
+            { label: 'Unassigned', value: String(analytics.unassigned || 0), color: (analytics.unassigned || 0) > 0 ? 'text-status-warning' : 'text-status-success' },
+            { label: 'Suspended Appeals', value: String(analytics.suspended_org_requests || 0), color: (analytics.suspended_org_requests || 0) > 0 ? 'text-status-error' : 'text-status-success' },
+          ].map((item) => (
+            <div key={item.label} className="glass-card rounded-2xl p-3">
+              <div className="text-[9px] font-mono uppercase tracking-widest text-brand-text-muted font-bold mb-1">{item.label}</div>
+              <div className={`text-lg font-bold ${item.color}`}>{item.value}</div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="flex items-center gap-1.5 p-1 bg-brand-surface-elevated rounded-2xl w-fit">
         {(["tickets", "knowledge"] as const).map((section) => (

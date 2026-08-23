@@ -7,12 +7,14 @@ import LiveChat from './LiveChat';
 interface WorkspaceSuspendedProps {
   organizationName: string;
   reason?: string;
+  suspensionId?: string;
 }
 
-export default function WorkspaceSuspended({ organizationName, reason }: WorkspaceSuspendedProps) {
+export default function WorkspaceSuspended({ organizationName, reason, suspensionId }: WorkspaceSuspendedProps) {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [chatOpen, setChatOpen] = useState(false);
+  const [appealSent, setAppealSent] = useState(false);
 
   return (
     <>
@@ -41,6 +43,26 @@ export default function WorkspaceSuspended({ organizationName, reason }: Workspa
               style={{ backgroundColor: 'var(--org-primary, #6366f1)' }}
             >
               <MessageCircle size={14} /> Contact Support
+            </button>
+            <button
+              onClick={async () => {
+                if (appealSent) return;
+                try {
+                  const { orgService } = await import('../../services/org-service');
+                  await orgService.createSupportTicket({
+                    subject: `Suspension Appeal — ${organizationName}`,
+                    description: `I would like to appeal the suspension of this workspace.${reason ? `\n\nStated reason: ${reason}` : ''}${suspensionId ? `\n\nSuspension reference: ${suspensionId}` : ''}\n\nI believe this suspension should be reviewed and lifted. Please investigate.`,
+                    category: 'suspension_appeal',
+                    priority: 'high',
+                  });
+                  setAppealSent(true);
+                  setChatOpen(true);
+                } catch { /* ignore */ }
+              }}
+              disabled={appealSent}
+              className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold border border-brand-divider text-brand-text-muted hover:bg-brand-surface-interactive/30 transition-all cursor-pointer disabled:opacity-50"
+            >
+              {appealSent ? 'Appeal Submitted' : 'Request Review'}
             </button>
             <button
               onClick={async () => {
