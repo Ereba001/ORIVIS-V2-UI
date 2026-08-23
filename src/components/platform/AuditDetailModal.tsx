@@ -10,7 +10,7 @@ const CATEGORY_ICONS: Record<string, typeof Shield> = {
 }
 
 const SEVERITY_STYLES: Record<string, string> = {
-  Info: "bg-blue-400/10 text-blue-400 border-blue-400/20",
+  Info: "bg-status-info/10 text-status-info border-status-info/20",
   Warning: "bg-status-warning/10 text-status-warning border-status-warning/20",
   Critical: "bg-status-error/10 text-status-error border-status-error/20",
 }

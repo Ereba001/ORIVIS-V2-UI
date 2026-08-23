@@ -284,7 +284,7 @@ export default function OrgHelp() {
           ) : (
             filteredReleaseNotes.map((note) => {
               const TypeIcon = note.type === 'feature' ? Star : note.type === 'fix' ? Bug : Lightbulb
-              const typeColor = note.type === 'feature' ? 'text-status-success' : note.type === 'fix' ? 'text-status-warning' : 'text-blue-400'
+              const typeColor = note.type === 'feature' ? 'text-status-success' : note.type === 'fix' ? 'text-status-warning' : 'text-status-info'
               return (
                 <DashboardCard key={note.id} hover={false}>
                   <div className="flex items-start justify-between mb-3">
@@ -394,7 +394,7 @@ export default function OrgHelp() {
               <h2 className="text-xs font-bold text-brand-text-primary mb-3">Contact Options</h2>
               <div className="space-y-3">
                 {([
-                  { icon: Mail, label: 'Email Support', desc: 'support@orivis.io', color: 'text-blue-400', action: 'none' as const },
+                  { icon: Mail, label: 'Email Support', desc: 'support@orivis.io', color: 'text-status-info', action: 'none' as const },
                   { icon: MessageCircle, label: 'Live Chat', desc: 'Available Mon-Fri, 9AM-6PM WAT', color: 'text-status-success', action: 'chat' as const },
                   { icon: Bug, label: 'Report a Bug', desc: 'Found an issue? Let us know.', color: 'text-status-warning', action: 'none' as const },
                 ]).map((c) => {

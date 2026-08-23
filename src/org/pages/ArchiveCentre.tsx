@@ -224,7 +224,7 @@ export default function OrgArchiveCentre() {
                     </div>
                     <div className="mt-2 flex items-center gap-2">
                       <span className="text-[10px] text-brand-text-muted">Retention:</span>
-                      <ProgressBar value={100} max={100} size="sm" color={record.retentionPeriod === '6 months' ? '#ef4444' : record.retentionPeriod === '1 year' ? '#f59e0b' : record.retentionPeriod === '2 years' ? '#FCA311' : '#10b981'} showLabel={false} />
+                      <ProgressBar value={100} max={100} size="sm" color={record.retentionPeriod === '6 months' ? 'var(--color-status-danger)' : record.retentionPeriod === '1 year' ? 'var(--color-status-warning)' : record.retentionPeriod === '2 years' ? 'var(--color-status-warning)' : 'var(--color-status-success)'} showLabel={false} />
                       <span className={`text-[9px] font-bold ${RETENTION_COLORS[record.retentionPeriod] || 'text-brand-text-muted'}`}>{record.retentionPeriod}</span>
                     </div>
                   </div>
@@ -289,7 +289,7 @@ export default function OrgArchiveCentre() {
                 onClick={(e) => e.stopPropagation()}
               >
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-status-error/10 flex items-center justify-center" style={{ color: '#ef4444' }}>
+                  <div className="w-10 h-10 rounded-xl bg-status-danger/10 flex items-center justify-center text-status-danger">
                     <AlertTriangle size={20} />
                   </div>
                   <h3 className="text-sm font-bold text-brand-text-primary">{confirmDialog.title}</h3>

@@ -125,7 +125,7 @@ export default function PlatformElections() {
                 <span className={`inline-flex items-center gap-1 text-[9px] font-mono uppercase tracking-wider px-2 py-0.5 rounded-full ${
                   el.status === "Live" ? "bg-status-success/10 text-status-success" :
                   el.status === "Upcoming" ? "bg-status-warning/10 text-status-warning" :
-                  el.status === "Pending Review" ? "bg-yellow-400/10 text-yellow-400" :
+                  el.status === "Pending Review" ? "bg-status-warning/10 text-status-warning" :
                   "bg-brand-surface-interactive text-brand-text-muted"
                 }`}>
                   {el.status === "Pending Review" && <Clock size={10} />}

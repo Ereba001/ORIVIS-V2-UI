@@ -66,7 +66,7 @@ export default function TimingDeviationModal({
             {/* Header */}
             <div className="flex items-start justify-between gap-3 mb-4">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ backgroundColor: '#F59E0B18' }}>
+                <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-status-warning/10">
                   <AlertTriangle size={16} className="text-status-warning" />
                 </div>
                 <h3 className="text-sm font-bold" style={{ color: 'var(--org-text, #e4e4ef)' }}>

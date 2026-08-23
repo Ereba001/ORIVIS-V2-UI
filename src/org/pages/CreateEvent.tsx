@@ -693,7 +693,7 @@ export default function CreateEvent() {
                   className="inline-flex items-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                   style={{
                     backgroundColor: canGoNext() ? branding.primaryColor : 'var(--color-brand-surface)',
-                    color: canGoNext() ? '#FFFFFF' : 'var(--color-brand-text-disabled)',
+                    color: canGoNext() ? 'var(--color-brand-text-primary)' : 'var(--color-brand-text-disabled)',
                   }}
                 >
                   Continue
@@ -1139,7 +1139,7 @@ export default function CreateEvent() {
                   className="w-2/3 inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs font-bold shadow-md transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                   style={{
                     backgroundColor: canGoNext() ? branding.primaryColor : 'var(--color-brand-surface)',
-                    color: canGoNext() ? '#FFFFFF' : 'var(--color-brand-text-disabled)',
+                    color: canGoNext() ? 'var(--color-brand-text-primary)' : 'var(--color-brand-text-disabled)',
                   }}
                 >
                   Continue

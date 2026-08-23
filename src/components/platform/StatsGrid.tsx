@@ -13,7 +13,7 @@ interface Props {
   items: StatItem[]
 }
 
-const DEFAULT_COLORS = ["text-brand-gold", "text-blue-400", "text-emerald-400", "text-amber-400"]
+const DEFAULT_COLORS = ["text-brand-gold", "text-status-info", "text-status-success", "text-status-warning"]
 
 export default function StatsGrid({ items }: Props) {
   return (

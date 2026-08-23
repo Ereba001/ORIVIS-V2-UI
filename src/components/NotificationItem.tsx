@@ -15,7 +15,7 @@ interface NotificationItemProps {
 
 const TYPE_CONFIG = {
   system: { icon: Settings, bg: "bg-brand-surface-interactive text-brand-text-muted" },
-  org: { icon: Building2, bg: "bg-blue-400/10 text-blue-400" },
+  org: { icon: Building2, bg: "bg-status-info/10 text-status-info" },
   election: { icon: ScrollText, bg: "bg-status-success/10 text-status-success" },
   alert: { icon: AlertTriangle, bg: "bg-status-error/10 text-status-error" },
 }

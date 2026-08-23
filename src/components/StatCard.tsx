@@ -29,11 +29,11 @@ const ICON_MAP: Record<string, React.ComponentType<{ size?: number }>> = {
 
 const COLOR_MAP: Record<string, string> = {
   orgs: "text-brand-gold",
-  users: "text-blue-400",
+  users: "text-status-info",
   events: "text-brand-text-muted",
-  revenue: "text-emerald-400",
+  revenue: "text-status-success",
   uptime: "text-status-success",
-  pending: "text-amber-400",
+  pending: "text-status-warning",
 }
 
 export default function StatCard({ stat, index }: StatCardProps) {

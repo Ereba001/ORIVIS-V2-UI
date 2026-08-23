@@ -57,7 +57,7 @@ export default function ConfirmDialog({
                 onClick={() => { onConfirm(); onClose() }}
                 className={`px-4 py-2 text-[11px] font-bold uppercase tracking-wider rounded-xl transition-colors cursor-pointer ${
                   confirmVariant === "danger"
-                    ? "bg-status-danger text-white hover:bg-red-500"
+                    ? "bg-status-danger text-white hover:bg-status-danger"
                     : "bg-brand-gold text-black hover:bg-brand-gold-hover"
                 }`}
               >

@@ -55,6 +55,7 @@ interface OrgBrandingContextType {
   status: OrgBrandingStatus
   retry: () => void
   updateBranding: (config: Partial<OrgBrandingConfig>) => void
+  assistedEventsEnabled: boolean
 }
 
 const OrgBrandingContext = createContext<OrgBrandingContextType | null>(null)
@@ -109,6 +110,7 @@ export function OrgBrandingProvider({ children }: { children: ReactNode }) {
   const [serverOrgContext, setServerOrgContext] = useState<string | null>(null)
   const [serverElectionCategories, setServerElectionCategories] = useState<string[]>([])
   const [serverOrgStatus, setServerOrgStatus] = useState<'active' | 'suspended' | 'closed' | null>(null)
+  const [assistedEventsEnabled, setAssistedEventsEnabled] = useState<boolean>(false)
   const overrideRef = useRef<Partial<OrgBrandingConfig> | null>(null)
   const requestSeq = useRef(0)
   const [retryTick, setRetryTick] = useState(0)
@@ -140,11 +142,13 @@ export function OrgBrandingProvider({ children }: { children: ReactNode }) {
           organizationContext?: string
           electionCategories?: string[]
           status?: string
+          assisted_events_enabled?: boolean
         }>(data)
         if (profile?.organizationType) setServerOrgType(profile.organizationType.toUpperCase())
         if (profile?.organizationContext) setServerOrgContext(profile.organizationContext)
         if (Array.isArray(profile?.electionCategories)) setServerElectionCategories(profile.electionCategories)
         if (profile?.status) setServerOrgStatus(profile.status as 'active' | 'suspended' | 'closed')
+        setAssistedEventsEnabled(!!profile?.assisted_events_enabled)
       })
       .catch((err) => { console.error('OrgBranding.fetchOrgProfile:', err) })
 
@@ -232,7 +236,7 @@ export function OrgBrandingProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <OrgBrandingContext.Provider value={{ branding, admin, isLoaded, status, retry, updateBranding }}>
+    <OrgBrandingContext.Provider value={{ branding, admin, isLoaded, status, retry, updateBranding, assistedEventsEnabled }}>
       {children}
     </OrgBrandingContext.Provider>
   )

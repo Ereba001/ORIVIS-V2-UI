@@ -16,7 +16,7 @@ const CATEGORY_ICONS: Record<string, typeof Shield> = {
   system: Shield, Governance: Eye,
 }
 const SEVERITY_COLORS: Record<string, string> = {
-  Info: "text-blue-400 bg-blue-400/10",
+  Info: "text-status-info bg-status-info/10",
   Warning: "text-status-warning bg-status-warning/10",
   Critical: "text-status-error bg-status-error/10",
 }

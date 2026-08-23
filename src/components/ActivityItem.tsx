@@ -14,8 +14,8 @@ interface ActivityItemProps {
 
 const TYPE_CONFIG = {
   create: { icon: Plus, bg: "bg-status-success/10 text-status-success", hoverBg: "hover:bg-status-success/5" },
-  publish: { icon: CheckCircle, bg: "bg-blue-400/10 text-blue-400", hoverBg: "hover:bg-blue-400/5" },
-  import: { icon: Upload, bg: "bg-purple-400/10 text-purple-400", hoverBg: "hover:bg-purple-400/5" },
+  publish: { icon: CheckCircle, bg: "bg-status-info/10 text-status-info", hoverBg: "hover:bg-status-info/5" },
+  import: { icon: Upload, bg: "bg-status-warning/10 text-status-warning", hoverBg: "hover:bg-status-warning/5" },
   system: { icon: Shield, bg: "bg-brand-surface-interactive text-brand-text-muted", hoverBg: "hover:bg-brand-surface-interactive/50" },
   alert: { icon: AlertTriangle, bg: "bg-status-error/10 text-status-error", hoverBg: "hover:bg-status-danger/5" },
 }

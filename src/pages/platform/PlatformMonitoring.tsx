@@ -230,7 +230,7 @@ function ExternalServiceCard({ name, svc }: { name: string; svc: { healthy: bool
 }
 
 function IncidentRow({ incident }: { incident: HealthIncident }) {
-  const severityColor = incident.severity === "critical" ? "text-status-error" : incident.severity === "warning" ? "text-status-warning" : "text-blue-400"
+  const severityColor = incident.severity === "critical" ? "text-status-error" : incident.severity === "warning" ? "text-status-warning" : "text-status-info"
   const StatusIcon = incident.status === "resolved" ? CheckCircle2 : incident.status === "investigating" ? AlertCircle : XCircle
 
   return (
@@ -253,10 +253,10 @@ function IncidentRow({ incident }: { incident: HealthIncident }) {
 
 function DependencyNodeCard({ node }: { node: DependencyNode }) {
   const typeColors: Record<string, string> = {
-    database: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    cache: "bg-purple-500/10 text-purple-400 border-purple-500/20",
-    queue: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-    scheduler: "bg-cyan-500/10 text-cyan-400 border-cyan-500/20",
+    database: "bg-status-info/10 text-status-info border-status-info/20",
+    cache: "bg-status-success/10 text-status-success border-status-success/20",
+    queue: "bg-status-danger/10 text-status-danger border-status-danger/20",
+    scheduler: "bg-status-info/10 text-status-info border-status-info/20",
     external: "bg-brand-gold/10 text-brand-gold border-brand-gold/20",
   }
 

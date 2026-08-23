@@ -479,8 +479,7 @@ export default function EventDetail() {
               onClick={() => setShowStartModal(true)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-bold transition-all text-white"
-              style={{ backgroundColor: '#22c55e' }}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-bold transition-all text-white bg-status-success"
             >
               <Play size={12} />
               Start Event
@@ -491,8 +490,7 @@ export default function EventDetail() {
               onClick={() => setShowEndModal(true)}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
-              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-bold transition-all text-white"
-              style={{ backgroundColor: '#ef4444' }}
+              className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-bold transition-all text-white bg-status-danger"
             >
               <Square size={12} />
               End Event
@@ -582,7 +580,7 @@ export default function EventDetail() {
         title="Start Election"
         description="This will immediately open voting for all registered participants. This action is audited."
         confirmLabel="Start Election"
-        confirmColor="#22c55e"
+        confirmColor="var(--color-status-success)"
         loading={lifecycleLoading}
         onConfirm={handleStartElection}
         onClose={() => setShowStartModal(false)}
@@ -592,7 +590,7 @@ export default function EventDetail() {
         title="End Election"
         description="This will immediately close voting. No further votes will be accepted. This action is audited."
         confirmLabel="End Election"
-        confirmColor="#ef4444"
+        confirmColor="var(--color-status-danger)"
         loading={lifecycleLoading}
         onConfirm={handleEndElection}
         onClose={() => setShowEndModal(false)}

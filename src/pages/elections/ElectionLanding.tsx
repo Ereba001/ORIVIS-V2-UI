@@ -21,14 +21,14 @@ interface StatusPill {
 
 function getStatusPill(status: ElectionStatus, regOpen: boolean): StatusPill {
   if (status === 'LIVE') {
-    return { label: 'LIVE', sub: 'Voting is open', color: '#10b981', bg: 'rgba(16,185,129,0.1)' }
+    return { label: 'LIVE', sub: 'Voting is open', color: 'var(--color-event-live)', bg: 'rgba(16,185,129,0.1)' }
   }
   if (status === 'PUBLISHED' || status === 'CREATED') {
     return regOpen
-      ? { label: 'OPEN FOR REGISTRATION', sub: 'Register to get your voting pass', color: '#6366f1', bg: 'rgba(99,102,241,0.1)' }
-      : { label: 'UPCOMING', sub: 'Registration not yet open', color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' }
+      ? { label: 'OPEN FOR REGISTRATION', sub: 'Register to get your voting pass', color: 'var(--color-event-upcoming)', bg: 'rgba(99,102,241,0.1)' }
+      : { label: 'UPCOMING', sub: 'Registration not yet open', color: 'var(--color-event-counting)', bg: 'rgba(245,158,11,0.12)' }
   }
-  return { label: 'CLOSED', sub: 'Voting has ended', color: '#94a3b8', bg: 'rgba(148,163,184,0.15)' }
+  return { label: 'CLOSED', sub: 'Voting has ended', color: 'var(--color-event-completed)', bg: 'rgba(148,163,184,0.15)' }
 }
 
 function orgInitials(name: string): string {

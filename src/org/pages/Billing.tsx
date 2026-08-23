@@ -191,8 +191,8 @@ export default function OrgBilling() {
   const { summary } = data?.summary ? data : { summary: { total_billed: 0, total_paid: 0, pending_amount: 0, total_events: 0, currency: 'NGN' } }
   const summaryCards = [
     { label: 'Total Billed', value: formatMoney(summary.total_billed, summary.currency), icon: CreditCard, color: pColor },
-    { label: 'Total Paid', value: formatMoney(summary.total_paid, summary.currency), icon: CheckCircle2, color: '#22C55E' },
-    { label: 'Pending', value: formatMoney(summary.pending_amount, summary.currency), icon: Clock, color: summary.pending_amount > 0 ? '#F59E0B' : '#22C55E' },
+    { label: 'Total Paid', value: formatMoney(summary.total_paid, summary.currency), icon: CheckCircle2, color: 'var(--color-status-success)' },
+    { label: 'Pending', value: formatMoney(summary.pending_amount, summary.currency), icon: Clock, color: summary.pending_amount > 0 ? 'var(--color-status-warning)' : 'var(--color-status-success)' },
     { label: 'Events Billed', value: String(summary.total_events), icon: Vote, color: pColor },
   ]
 
@@ -263,7 +263,7 @@ export default function OrgBilling() {
                     <td className='py-3 pr-3'><span className='text-[10px] text-brand-text-secondary font-medium'>{ev.tier_name ?? (ev.is_free ? 'Free' : '\u2014')}</span></td>
                     <td className='py-3 pr-3 text-xs font-bold text-brand-text-primary text-right whitespace-nowrap'>{ev.participant_count?.toLocaleString() ?? '0'}</td>
                     <td className='py-3 pr-3 text-xs font-bold text-brand-text-primary text-right whitespace-nowrap'>{formatMoney(ev.amount, ev.currency)}</td>
-                    <td className='py-3 pr-3 text-xs font-bold text-right whitespace-nowrap' style={{ color: isPaid ? '#22C55E' : '#F59E0B' }}>{formatMoney(ev.paid_amount, ev.currency)}</td>
+                    <td className='py-3 pr-3 text-xs font-bold text-right whitespace-nowrap' style={{ color: isPaid ? 'var(--color-status-success)' : 'var(--color-status-warning)' }}>{formatMoney(ev.paid_amount, ev.currency)}</td>
                     <td className='py-3 pr-3 text-right'>
                       <span className={`inline-flex items-center gap-1 text-[9px] font-bold capitalize ${st.className}`}><StIcon size={10} />{st.label}</span>
                     </td>
@@ -310,7 +310,7 @@ export default function OrgBilling() {
                     </div>
                     <div>
                       <p className='text-[10px] text-brand-text-muted'>Paid</p>
-                      <p className='text-xs font-bold' style={{ color: isPaid ? '#22C55E' : '#F59E0B' }}>{formatMoney(ev.paid_amount, ev.currency)}</p>
+                      <p className='text-xs font-bold' style={{ color: isPaid ? 'var(--color-status-success)' : 'var(--color-status-warning)' }}>{formatMoney(ev.paid_amount, ev.currency)}</p>
                     </div>
                   </div>
                   <div className='flex items-center gap-3 pt-1'>

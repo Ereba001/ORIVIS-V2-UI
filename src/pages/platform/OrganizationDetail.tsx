@@ -58,9 +58,9 @@ const SEVERITY_COLORS: Record<string, string> = {
 }
 
 const SEVERITY_DOT: Record<string, string> = {
-  info: "bg-blue-400",
-  warning: "bg-amber-400",
-  critical: "bg-red-400",
+  info: "bg-status-info",
+  warning: "bg-status-warning",
+  critical: "bg-status-danger",
 }
 
 const SUB_PILL: Record<string, "success" | "warning" | "danger" | "info" | "neutral"> = {
@@ -81,7 +81,7 @@ const TICKET_PILL: Record<string, "success" | "warning" | "danger" | "info" | "n
 }
 
 const AUDIT_SEV: Record<string, string> = {
-  Info: "text-blue-400 bg-blue-400/10",
+  Info: "text-status-info bg-status-info/10",
   Warning: "text-status-warning bg-status-warning/10",
   Critical: "text-status-error bg-status-error/10",
 }
@@ -143,6 +143,41 @@ export default function OrganizationDetail() {
       console.error("Failed to assign pricing tier:", err)
     } finally {
       setAssigningTier(false)
+    }
+  }
+
+  const showToast = (type: "success" | "error", message: string) => {
+    setToast({ type, message })
+    setTimeout(() => setToast(null), 3000)
+  }
+
+  const handleSuspend = async () => {
+    if (!org?.organizationId) return
+    if (!window.confirm(`Are you sure you want to suspend "${org.organizationName}"? This action can be reversed later.`)) return
+    setActing(true)
+    try {
+      await getApiClient().post(API.ENDPOINTS.PLATFORM.SUSPEND_ORGANIZATION(org.organizationId), { reason: "Suspended by platform admin" })
+      showToast("success", "Organization suspended successfully")
+      reload()
+    } catch (err: any) {
+      showToast("error", err?.response?.data?.message || "Failed to suspend organization")
+    } finally {
+      setActing(false)
+    }
+  }
+
+  const handleReactivate = async () => {
+    if (!org?.organizationId) return
+    if (!window.confirm(`Are you sure you want to reactivate "${org.organizationName}"?`)) return
+    setActing(true)
+    try {
+      await getApiClient().post(API.ENDPOINTS.PLATFORM.ACTIVATE_ORGANIZATION(org.organizationId))
+      showToast("success", "Organization reactivated successfully")
+      reload()
+    } catch (err: any) {
+      showToast("error", err?.response?.data?.message || "Failed to reactivate organization")
+    } finally {
+      setActing(false)
     }
   }
 
@@ -244,13 +279,13 @@ export default function OrganizationDetail() {
         <StatsGrid
           items={[
             { label: "Members", value: org.members.toLocaleString(), icon: Users, color: "text-brand-gold" },
-            { label: "Admins", value: org.admins.toLocaleString(), icon: Shield, color: "text-blue-400" },
-            { label: "Active Events", value: org.activeEvents.toString(), icon: FileText, color: "text-emerald-400" },
+            { label: "Admins", value: org.admins.toLocaleString(), icon: Shield, color: "text-status-info" },
+            { label: "Active Events", value: org.activeEvents.toString(), icon: FileText, color: "text-status-success" },
             {
               label: "Storage",
               value: `${org.storageUsed} GB / ${org.storageTotal} GB`,
               icon: HardDrive,
-              color: "text-amber-400",
+              color: "text-status-warning",
             },
           ]}
         />
@@ -262,6 +297,7 @@ export default function OrganizationDetail() {
               Organization Profile
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {org.orivisId && <ProfileField icon={Building2} label="ORIVIS ID" value={org.orivisId} />}
               <ProfileField icon={Mail} label="Email" value={org.email ?? "—"} />
               <ProfileField icon={Phone} label="Phone" value={org.phone ?? "—"} />
               <ProfileField icon={MapPin} label="Location" value={org.country} />
@@ -355,6 +391,7 @@ export default function OrganizationDetail() {
               Quick Overview
             </h3>
             <div className="space-y-3">
+              {org.orivisId && <QuickRow label="ORIVIS ID" value={org.orivisId} />}
               <QuickRow label="Plan" value={org.plan} />
               <QuickRow label="Status" value={org.status} />
               <QuickRow label="Members" value={org.members.toLocaleString()} />
@@ -529,8 +566,8 @@ export default function OrganizationDetail() {
   const renderMembersTab = () => {
     const counts = [
       { label: "Members", value: org.members.toLocaleString(), icon: Users, color: "text-brand-gold" },
-      { label: "Admins", value: org.admins.toLocaleString(), icon: Shield, color: "text-blue-400" },
-      { label: "Invitations", value: memberships.filter((m) => m.status === "Pending").length.toString(), icon: MessageSquare, color: "text-amber-400" },
+      { label: "Admins", value: org.admins.toLocaleString(), icon: Shield, color: "text-status-info" },
+      { label: "Invitations", value: memberships.filter((m) => m.status === "Pending").length.toString(), icon: MessageSquare, color: "text-status-warning" },
     ]
     return (
       <div className="space-y-6">
@@ -807,6 +844,16 @@ export default function OrganizationDetail() {
   return (
     <>
       <SeoHead meta={{ title: `${org.organizationName} — Platform Console | ORIVIS`, noindex: true }} />
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 flex items-center gap-2 px-4 py-3 rounded-xl text-xs font-semibold shadow-lg transition-all ${
+          toast.type === "success"
+            ? "bg-status-success/90 text-white"
+            : "bg-status-error/90 text-white"
+        }`}>
+          {toast.type === "success" ? <CheckCircle2 size={14} /> : <AlertTriangle size={14} />}
+          {toast.message}
+        </div>
+      )}
       <div className="space-y-6">
         <Breadcrumbs
           items={[
@@ -830,6 +877,12 @@ export default function OrganizationDetail() {
                   <StatusPill status={org.status} variant={STATUS_MAP[org.status] || "neutral"} />
                 </div>
                 <div className="flex items-center gap-2 text-[10px] font-mono text-brand-text-muted">
+                  {org.orivisId && (
+                    <>
+                      <span>{org.orivisId}</span>
+                      <span className="w-1 h-1 rounded-full bg-brand-text-disabled" />
+                    </>
+                  )}
                   <span>{org.slug}</span>
                   <span className="w-1 h-1 rounded-full bg-brand-text-disabled" />
                   <span>{org.plan}</span>
@@ -852,9 +905,11 @@ export default function OrganizationDetail() {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex items-center gap-1.5 bg-status-error/10 hover:bg-status-error/20 text-status-error border border-status-error/20 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer"
+                  onClick={handleSuspend}
+                  disabled={acting}
+                  className="flex items-center gap-1.5 bg-status-error/10 hover:bg-status-error/20 text-status-error border border-status-error/20 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <PauseCircle size={14} />
+                  {acting ? <Loader2 size={14} className="animate-spin" /> : <PauseCircle size={14} />}
                   <span>Suspend</span>
                 </motion.button>
               )}
@@ -862,9 +917,11 @@ export default function OrganizationDetail() {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="flex items-center gap-1.5 bg-status-success/10 hover:bg-status-success/20 text-status-success border border-status-success/20 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer"
+                  onClick={handleReactivate}
+                  disabled={acting}
+                  className="flex items-center gap-1.5 bg-status-success/10 hover:bg-status-success/20 text-status-success border border-status-success/20 px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-wider transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  <PlayCircle size={14} />
+                  {acting ? <Loader2 size={14} className="animate-spin" /> : <PlayCircle size={14} />}
                   <span>Reactivate</span>
                 </motion.button>
               )}

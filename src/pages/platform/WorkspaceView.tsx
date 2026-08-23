@@ -245,13 +245,13 @@ export default function WorkspaceView() {
             <StatsGrid
               items={[
                 { label: "Members", value: (org?.users_count ?? 0).toLocaleString(), icon: Users, color: "text-brand-gold" },
-                { label: "Admins", value: (org?.admins_count ?? 0).toLocaleString(), icon: ShieldCheck, color: "text-blue-400" },
-                { label: "Events", value: (org?.elections_count ?? 0).toString(), icon: FileText, color: "text-emerald-400" },
+                { label: "Admins", value: (org?.admins_count ?? 0).toLocaleString(), icon: ShieldCheck, color: "text-status-info" },
+                { label: "Events", value: (org?.elections_count ?? 0).toString(), icon: FileText, color: "text-status-success" },
                 {
                   label: "Storage",
                   value: formatBytes(data?.storage?.bytes ?? 0),
                   icon: HardDrive,
-                  color: "text-amber-400",
+                  color: "text-status-warning",
                 },
               ]}
             />

@@ -76,9 +76,9 @@ export function OverviewTab({ event, activities, analytics: _analytics, readines
               {readinessChecks.map((check) => (
                 <div key={check.key} className="flex items-center gap-2 text-xs">
                   {check.ok ? (
-                    <CheckCircle size={14} className="text-green-500 shrink-0" />
+                    <CheckCircle size={14} className="text-status-success shrink-0" />
                   ) : (
-                    <XCircle size={14} className="text-red-400 shrink-0" />
+                    <XCircle size={14} className="text-status-danger shrink-0" />
                   )}
                   <span className={check.ok ? 'text-brand-text-primary' : 'text-brand-text-muted'}>
                     {check.label}
@@ -152,7 +152,7 @@ export function OverviewTab({ event, activities, analytics: _analytics, readines
             </div>
           ) : (
             <div className="glass-card rounded-2xl p-4 text-center">
-              <div className="w-9 h-9 rounded-xl flex items-center justify-center mx-auto mb-2 bg-brand-surface-elevated" style={{ color: '#a3a3a3' }}>
+              <div className="w-9 h-9 rounded-xl flex items-center justify-center mx-auto mb-2 bg-brand-surface-elevated text-brand-text-muted">
                 <AlertTriangle size={16} />
               </div>
               <p className="text-lg font-bold text-brand-text-muted">N/A</p>

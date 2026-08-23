@@ -19,7 +19,7 @@ const STATUS_META: Record<PlatformPayment["status"], { label: string; className:
   cancelled: { label: "cancelled", className: "text-brand-text-muted bg-brand-surface-elevated" },
 }
 
-const TREND_COLORS = ["bg-brand-gold", "bg-blue-500", "bg-violet-500", "bg-emerald-500", "bg-rose-400", "bg-teal-400"]
+const TREND_COLORS = ["bg-brand-gold", "bg-status-info", "bg-status-success", "bg-status-warning", "bg-status-danger", "bg-status-info"]
 
 function BucketCard({ title, icon, bucket, note, currency }: { title: string; icon: React.ReactNode; bucket: PlatformCurrencyBucket; note: string; currency: string }) {
   return (
@@ -162,7 +162,7 @@ export default function Finance() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
               <BucketCard title="Local (NGN)" icon={<Landmark size={14} className="text-brand-gold" />} bucket={analytics?.local ?? { count: 0, revenue: 0, avgTransactionValue: 0, successful: 0, pending: 0, failed: 0, cancelled: 0 }} note="Nigerian naira payments. NGN is the default platform billing currency." currency="NGN" />
-              <BucketCard title="International (USD)" icon={<Globe size={14} className="text-blue-400" />} bucket={analytics?.international ?? { count: 0, revenue: 0, avgTransactionValue: 0, successful: 0, pending: 0, failed: 0, cancelled: 0 }} note="US dollar payments (optional explicit currency)." currency="USD" />
+              <BucketCard title="International (USD)" icon={<Globe size={14} className="text-status-info" />} bucket={analytics?.international ?? { count: 0, revenue: 0, avgTransactionValue: 0, successful: 0, pending: 0, failed: 0, cancelled: 0 }} note="US dollar payments (optional explicit currency)." currency="USD" />
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">

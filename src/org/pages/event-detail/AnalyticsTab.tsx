@@ -7,9 +7,9 @@ import ProgressBar from '../../components/ProgressBar'
 import { type OrivisEvent, type EventAnalytics } from './_shared'
 
 const HEALTH_COLORS: Record<string, string> = {
-  healthy: '#22C55E',
-  warning: '#F59E0B',
-  critical: '#EF4444',
+  healthy: 'var(--color-status-success)',
+  warning: 'var(--color-status-warning)',
+  critical: 'var(--color-status-danger)',
 }
 
 export function AnalyticsTab({ event, analytics }: { event: OrivisEvent; analytics?: EventAnalytics | null }) {

@@ -102,10 +102,10 @@ export default function FounderAuditConsole() {
       label: "Risk",
       render: (s) => {
         const colors: Record<string, string> = {
-          low: "text-emerald-400 bg-emerald-400/10",
-          medium: "text-amber-400 bg-amber-400/10",
-          high: "text-orange-400 bg-orange-400/10",
-          critical: "text-red-400 bg-red-400/10",
+          low: "text-status-success bg-status-success/10",
+          medium: "text-status-warning bg-status-warning/10",
+          high: "text-status-danger bg-status-danger/10",
+          critical: "text-status-danger bg-status-danger/10",
         }
         const level = s.riskLevel ?? "low"
         return (

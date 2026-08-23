@@ -25,9 +25,9 @@ import type {
 // Severity and classification helpers
 const SEVERITY_CONFIG: Record<SecurityEventSeverity, { color: string; bg: string; border: string; icon: typeof Shield }> = {
   INFO: { color: "text-brand-text-muted", bg: "bg-brand-surface-elevated", border: "border-brand-border", icon: Shield },
-  LOW: { color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/20", icon: Shield },
+  LOW: { color: "text-status-info", bg: "bg-status-info/10", border: "border-status-info/20", icon: Shield },
   MEDIUM: { color: "text-status-warning", bg: "bg-status-warning/10", border: "border-status-warning/20", icon: ShieldAlert },
-  HIGH: { color: "text-orange-400", bg: "bg-orange-500/10", border: "border-orange-500/20", icon: ShieldAlert },
+  HIGH: { color: "text-status-danger", bg: "bg-status-danger/10", border: "border-status-danger/20", icon: ShieldAlert },
   CRITICAL: { color: "text-status-error", bg: "bg-status-error/10", border: "border-status-error/20", icon: ShieldX },
 }
 
@@ -35,30 +35,30 @@ const CLASSIFICATION_CONFIG: Record<SecurityClassification, { color: string; lab
   NORMAL: { color: "text-status-success", label: "Normal" },
   SUSPICIOUS: { color: "text-status-warning", label: "Suspicious" },
   MALICIOUS: { color: "text-status-error", label: "Malicious" },
-  BLOCKED: { color: "text-red-500", label: "Blocked" },
+  BLOCKED: { color: "text-status-danger", label: "Blocked" },
 }
 
 const INCIDENT_STATUS_CONFIG: Record<IncidentStatus, { color: string; bg: string }> = {
   OPEN: { color: "text-status-error", bg: "bg-status-error/10 border border-status-error/20" },
   INVESTIGATING: { color: "text-status-warning", bg: "bg-status-warning/10 border border-status-warning/20" },
-  CONTAINED: { color: "text-blue-400", bg: "bg-blue-500/10 border border-blue-500/20" },
+  CONTAINED: { color: "text-status-info", bg: "bg-status-info/10 border border-status-info/20" },
   RESOLVED: { color: "text-status-success", bg: "bg-status-success/10 border border-status-success/20" },
   FALSE_POSITIVE: { color: "text-brand-text-muted", bg: "bg-brand-surface-elevated border border-brand-border" },
 }
 
 function riskColor(score: number): string {
   if (score >= 95) return "text-status-error"
-  if (score >= 80) return "text-orange-400"
+  if (score >= 80) return "text-status-danger"
   if (score >= 60) return "text-status-warning"
-  if (score >= 20) return "text-blue-400"
+  if (score >= 20) return "text-status-info"
   return "text-brand-text-muted"
 }
 
 function riskBg(score: number): string {
   if (score >= 95) return "bg-status-error"
-  if (score >= 80) return "bg-orange-500"
+  if (score >= 80) return "bg-status-danger"
   if (score >= 60) return "bg-status-warning"
-  if (score >= 20) return "bg-blue-500"
+  if (score >= 20) return "bg-status-info"
   return "bg-brand-text-muted"
 }
 
@@ -85,7 +85,7 @@ function ConnectionBadge({ status, lastEventAge }: { status: ConnectionStatus; l
   const config = {
     LIVE: { color: "bg-status-success", text: "LIVE", textColor: "text-status-success" },
     RECONNECTING: { color: "bg-status-warning", text: "RECONNECTING", textColor: "text-status-warning" },
-    DEGRADED: { color: "bg-orange-500", text: "DEGRADED", textColor: "text-orange-400" },
+    DEGRADED: { color: "bg-status-danger", text: "DEGRADED", textColor: "text-status-danger" },
     OFFLINE: { color: "bg-status-error", text: "OFFLINE", textColor: "text-status-error" },
   }[status]
 
@@ -212,9 +212,9 @@ function EventRow({ event, onSelect }: { event: SecurityEvent; onSelect: (e: Sec
     >
       <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
         event.severity === "CRITICAL" ? "bg-status-error animate-pulse" :
-        event.severity === "HIGH" ? "bg-orange-500" :
+        event.severity === "HIGH" ? "bg-status-danger" :
         event.severity === "MEDIUM" ? "bg-status-warning" :
-        event.severity === "LOW" ? "bg-blue-500" : "bg-brand-text-disabled"
+        event.severity === "LOW" ? "bg-status-info" : "bg-brand-text-disabled"
       }`} />
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2 flex-wrap">
@@ -246,7 +246,7 @@ function IncidentRow({ incident, onSelect }: { incident: SecurityIncident; onSel
       <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
         incident.status === "OPEN" ? "bg-status-error animate-pulse" :
         incident.status === "INVESTIGATING" ? "bg-status-warning" :
-        incident.status === "CONTAINED" ? "bg-blue-500" :
+        incident.status === "CONTAINED" ? "bg-status-info" :
         incident.status === "RESOLVED" ? "bg-status-success" : "bg-brand-text-disabled"
       }`} />
       <div className="flex-1 min-w-0">
@@ -272,7 +272,7 @@ function AlertRow({ alert, onAction }: { alert: SecurityAlert; onAction: (id: nu
     <div className="flex items-start gap-3 px-4 py-3 border-b border-brand-divider">
       <div className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${
         alert.severity === "CRITICAL" ? "bg-status-error animate-pulse" :
-        alert.severity === "HIGH" ? "bg-orange-500" :
+        alert.severity === "HIGH" ? "bg-status-danger" :
         alert.severity === "MEDIUM" ? "bg-status-warning" : "bg-brand-text-disabled"
       }`} />
       <div className="flex-1 min-w-0">
@@ -286,7 +286,7 @@ function AlertRow({ alert, onAction }: { alert: SecurityAlert; onAction: (id: nu
       <div className="shrink-0 flex items-center gap-1">
         {alert.status === "OPEN" && (
           <>
-            <button onClick={(e) => { e.stopPropagation(); onAction(alert.id, "acknowledge") }} className="text-[9px] px-2 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 transition-all cursor-pointer">Ack</button>
+            <button onClick={(e) => { e.stopPropagation(); onAction(alert.id, "acknowledge") }} className="text-[9px] px-2 py-1 rounded-lg bg-status-info/10 border border-status-info/20 text-status-info hover:bg-status-info/20 transition-all cursor-pointer">Ack</button>
             <button onClick={(e) => { e.stopPropagation(); onAction(alert.id, "false-positive") }} className="text-[9px] px-2 py-1 rounded-lg bg-brand-surface-elevated border border-brand-border text-brand-text-muted hover:bg-brand-surface-interactive transition-all cursor-pointer">FP</button>
           </>
         )}
@@ -408,7 +408,7 @@ export default function PlatformSecurity() {
               <StatCard label="Critical Alerts" value={dashboard.critical_alerts} icon={Bell} color={dashboard.critical_alerts > 0 ? "text-status-error" : "text-brand-text-muted"} />
               <StatCard label="Suspended Orgs" value={dashboard.suspended_organizations} icon={Ban} color={dashboard.suspended_organizations > 0 ? "text-status-error" : "text-status-success"} />
               <StatCard label="Suspicious Sources" value={dashboard.suspicious_sources} icon={Crosshair} color={dashboard.suspicious_sources > 0 ? "text-status-warning" : "text-status-success"} />
-              <StatCard label="Active Orgs" value={dashboard.active_organizations} icon={Building2} color="text-blue-400" />
+              <StatCard label="Active Orgs" value={dashboard.active_organizations} icon={Building2} color="text-status-info" />
             </div>
             {activityGraph && <ActivityGraph buckets={activityGraph.buckets} total={activityGraph.total} periodMinutes={activityGraph.period_minutes} />}
             <div className="flex items-center gap-1 p-1 bg-brand-surface rounded-xl border border-brand-divider">

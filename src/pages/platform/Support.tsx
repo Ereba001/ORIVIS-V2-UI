@@ -30,18 +30,18 @@ const STATUS_VARIANT: Record<TicketStatus, "success" | "warning" | "danger" | "i
 }
 
 const PRIORITY_COLORS: Record<TicketPriority, string> = {
-  LOW: "bg-gray-400/10 text-gray-400 border-gray-400/20",
-  MEDIUM: "bg-blue-400/10 text-blue-400 border-blue-400/20",
+  LOW: "bg-brand-text-muted/10 text-brand-text-muted border-brand-text-muted/20",
+  MEDIUM: "bg-status-info/10 text-status-info border-status-info/20",
   HIGH: "bg-status-warning/10 text-status-warning border-status-warning/20",
   URGENT: "bg-status-error/10 text-status-error border-status-error/20",
 }
 
 const CATEGORY_COLORS: Record<TicketCategory, string> = {
-  TECHNICAL: "bg-cyan-400/10 text-cyan-400 border-cyan-400/20",
-  BILLING: "bg-amber-400/10 text-amber-400 border-amber-400/20",
-  ACCOUNT: "bg-purple-400/10 text-purple-400 border-purple-400/20",
-  FEATURE_REQUEST: "bg-blue-400/10 text-blue-400 border-blue-400/20",
-  BUG_REPORT: "bg-red-400/10 text-red-400 border-red-400/20",
+  TECHNICAL: "bg-status-info/10 text-status-info border-status-info/20",
+  BILLING: "bg-status-warning/10 text-status-warning border-status-warning/20",
+  ACCOUNT: "bg-status-info/10 text-status-info border-status-info/20",
+  FEATURE_REQUEST: "bg-status-info/10 text-status-info border-status-info/20",
+  BUG_REPORT: "bg-status-danger/10 text-status-danger border-status-danger/20",
   OTHER: "bg-brand-surface-interactive text-brand-text-muted border-brand-border",
 }
 
@@ -343,8 +343,8 @@ export default function PlatformSupportCentre() {
 
   const statsItems = useMemo(() => [
     { label: "Open", value: String(counts.open), icon: AlertCircle, color: "text-status-warning" },
-    { label: "Assigned", value: String(counts.assigned), icon: User, color: "text-blue-400" },
-    { label: "Accepted", value: String(counts.accepted), icon: CheckCircle, color: "text-cyan-400" },
+    { label: "Assigned", value: String(counts.assigned), icon: User, color: "text-status-info" },
+    { label: "Accepted", value: String(counts.accepted), icon: CheckCircle, color: "text-status-success" },
     { label: "Waiting", value: String(counts.waiting), icon: Clock, color: "text-brand-text-muted" },
     { label: "Resolved", value: String(counts.resolved + counts.closed), icon: MessageSquare, color: "text-status-success" },
   ], [counts])

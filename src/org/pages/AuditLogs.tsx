@@ -30,13 +30,13 @@ const MODULE_ICONS: Record<string, typeof Shield> = {
 }
 
 const SEVERITY_STYLES = {
-  info: 'bg-blue-400/10 text-blue-400 border-blue-400/20',
+  info: 'bg-status-info/10 text-status-info border-status-info/20',
   warning: 'bg-status-warning/10 text-status-warning border-status-warning/20',
   critical: 'bg-status-error/10 text-status-error border-status-error/20',
 }
 
 const SEVERITY_DOTS = {
-  info: 'bg-blue-400',
+  info: 'bg-status-info',
   warning: 'bg-status-warning',
   critical: 'bg-status-error',
 }

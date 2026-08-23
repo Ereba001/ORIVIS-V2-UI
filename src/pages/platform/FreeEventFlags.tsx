@@ -11,7 +11,7 @@ import { useApiResource } from "../../hooks/useApiResource"
 import type { PlatformFreeEventFlag } from "../../types/platform"
 
 const SEVERITY_COLORS: Record<string, string> = {
-  low: "text-blue-400 bg-blue-400/10",
+  low: "text-status-info bg-status-info/10",
   medium: "text-status-warning bg-status-warning/10",
   high: "text-status-error bg-status-error/10",
 }
@@ -263,7 +263,7 @@ export default function FreeEventFlags() {
                         )}
                         {flag.isBlocked && (
                           <button onClick={() => runAction("unblock", flag)} disabled={busy !== null}
-                            className="flex items-center gap-1 text-[10px] font-mono font-bold px-2 py-1.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/20 disabled:opacity-50 cursor-pointer">
+                            className="flex items-center gap-1 text-[10px] font-mono font-bold px-2 py-1.5 rounded-lg bg-status-success/10 border border-status-success/30 text-status-success hover:bg-status-success/20 disabled:opacity-50 cursor-pointer">
                             <RotateCcw size={11} /> Unblock
                           </button>
                         )}
@@ -317,7 +317,7 @@ export default function FreeEventFlags() {
               </button>
               <button onClick={confirmAction} disabled={busy !== null}
                 className="px-4 py-2 rounded-xl text-[10px] font-bold text-white hover:opacity-90 transition-all disabled:opacity-50"
-                style={{ backgroundColor: promptAction.action === "block" ? "var(--status-error, #ef4444)" : promptAction.action === "unblock" ? "#10b981" : undefined }}>
+                style={{ backgroundColor: promptAction.action === "block" ? "var(--color-status-danger)" : promptAction.action === "unblock" ? "var(--color-status-success)" : undefined }}>
                 {busy !== null ? "Processing..." : promptAction.action === "resolve" ? "Resolve" : promptAction.action === "block" ? "Block" : "Unblock"}
               </button>
             </div>

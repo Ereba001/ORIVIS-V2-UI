@@ -28,9 +28,9 @@ interface LiveChatProps {
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; Icon: typeof CircleDot }> = {
   open: { label: 'Open', color: 'text-status-warning', Icon: CircleDot },
-  assigned: { label: 'Assigned', color: 'text-blue-400', Icon: Clock },
-  accepted: { label: 'Accepted', color: 'text-cyan-400', Icon: CheckCircle2 },
-  in_progress: { label: 'In Progress', color: 'text-cyan-400', Icon: Clock },
+  assigned: { label: 'Assigned', color: 'text-status-info', Icon: Clock },
+  accepted: { label: 'Accepted', color: 'text-status-info', Icon: CheckCircle2 },
+  in_progress: { label: 'In Progress', color: 'text-status-info', Icon: Clock },
   waiting: { label: 'Waiting', color: 'text-brand-text-muted', Icon: Clock },
   resolved: { label: 'Resolved', color: 'text-status-success', Icon: CheckCircle2 },
   closed: { label: 'Closed', color: 'text-brand-text-disabled', Icon: Archive },

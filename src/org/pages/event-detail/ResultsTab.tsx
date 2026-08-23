@@ -85,7 +85,7 @@ export function ResultsTab({ event, positions }: { event: OrivisEvent; positions
       {isCertified && (
         <DashboardCard hover={false} className="border-status-success/20">
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ backgroundColor: '#22C55E20' }}>
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0 bg-status-success/10">
               <BadgeCheck size={24} className="text-status-success" />
             </div>
             <div className="flex-1">
@@ -224,7 +224,7 @@ export function ResultsTab({ event, positions }: { event: OrivisEvent; positions
                   ) : (
                     <Trophy size={14} style={{ color: pColor }} />
                   )}
-                  <h3 className="text-xs font-bold " style={isCertified ? { color: '#22C55E' } : { color: pColor }}>{pos.title}</h3>
+                   <h3 className="text-xs font-bold " style={isCertified ? { color: 'var(--color-status-success)' } : { color: pColor }}>{pos.title}</h3>
                   {isCertified && (
                     <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-status-success/10 text-status-success border border-status-success/20 ">
                       Certified
@@ -239,7 +239,7 @@ export function ResultsTab({ event, positions }: { event: OrivisEvent; positions
                   const isWinner = i === 0 && totalVotes > 0
                   return (
                     <div key={c.id} className={`flex items-center gap-3 p-3 rounded-xl transition-all ${isWinner ? 'bg-status-success/10 border border-status-success/20' : 'bg-brand-surface-elevated/20'}`}>
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-[9px] font-bold text-white shrink-0" style={{ backgroundColor: isWinner ? '#22C55E' : pColor }}>
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-[9px] font-bold text-white shrink-0" style={{ backgroundColor: isWinner ? 'var(--color-status-success)' : pColor }}>
                         {c.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -250,7 +250,7 @@ export function ResultsTab({ event, positions }: { event: OrivisEvent; positions
                         <p className="text-[9px] text-brand-text-muted">{c.voteCount || 0} votes &middot; {pct}%</p>
                       </div>
                       <div className="w-24 h-1.5 rounded-full bg-brand-surface-elevated overflow-hidden">
-                        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: isWinner ? '#22C55E' : pColor }} />
+                        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: isWinner ? 'var(--color-status-success)' : pColor }} />
                       </div>
                     </div>
                   )

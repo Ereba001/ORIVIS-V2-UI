@@ -41,12 +41,12 @@ export default function Billing() {
   const maxElectionSegment = Math.max(electionSegments[0].value, electionSegments[1].value, 1)
 
   const SUMMARY = [
-    { label: "Total Organizations", value: fmt(orgs?.total), icon: Building2, color: "text-blue-400" },
+    { label: "Total Organizations", value: fmt(orgs?.total), icon: Building2, color: "text-status-info" },
     { label: "Paid Organizations", value: fmt(orgs?.paid), icon: Users, color: "text-status-success" },
     { label: "Paid Events", value: fmt(elections?.paid), icon: Vote, color: "text-brand-gold" },
-    { label: "Free Events", value: fmt(elections?.free), icon: Vote, color: "text-violet-400" },
+    { label: "Free Events", value: fmt(elections?.free), icon: Vote, color: "text-status-info" },
     { label: "Verified Payments", value: fmt(payments?.verified), icon: ReceiptText, color: "text-status-success" },
-    { label: "Total Revenue", value: totalRevenue > 0 && revenueEntries.length === 1 ? formatMoney(revenueEntries[0][1], revenueEntries[0][0]) : `${revenueEntries.length} currency(ies)`, icon: Wallet, color: "text-green-400" },
+    { label: "Total Revenue", value: totalRevenue > 0 && revenueEntries.length === 1 ? formatMoney(revenueEntries[0][1], revenueEntries[0][0]) : `${revenueEntries.length} currency(ies)`, icon: Wallet, color: "text-status-success" },
   ]
 
   return (
@@ -122,7 +122,7 @@ export default function Billing() {
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[9px] font-mono uppercase tracking-wider font-bold ${seg.className}`}>{fmt(seg.value)}</span>
                     </div>
                     <div className="h-2 bg-brand-surface-elevated rounded-full overflow-hidden">
-                      <div className="h-full rounded-full transition-all duration-500 bg-blue-500" style={{ width: `${(seg.value / maxElectionSegment) * 100}%` }} />
+                      <div className="h-full rounded-full transition-all duration-500 bg-status-info" style={{ width: `${(seg.value / maxElectionSegment) * 100}%` }} />
                     </div>
                   </div>
                 ))}

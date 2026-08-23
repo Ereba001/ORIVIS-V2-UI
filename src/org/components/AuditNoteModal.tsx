@@ -18,7 +18,7 @@ export default function AuditNoteModal({
   title,
   description,
   confirmLabel,
-  confirmColor = '#ef4444',
+  confirmColor = 'var(--color-status-danger)',
   loading = false,
   onConfirm,
   onClose,

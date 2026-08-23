@@ -119,13 +119,13 @@ export default function ActionPanel({
                 key={method.key}
                 className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-[9px] font-medium border ${
                   method.available
-                    ? 'border-green-300 bg-green-50 text-green-700'
-                    : 'border-gray-200 bg-gray-50 text-gray-400'
+                    ? 'border-status-success bg-status-success/10 text-status-success'
+                    : 'border-brand-border bg-brand-surface text-brand-text-muted'
                 }`}
               >
                 {method.label}
                 {method.coming_soon && (
-                  <span className="text-[8px] bg-gray-200 text-gray-500 px-1 rounded-full">
+                  <span className="text-[8px] bg-brand-surface-elevated text-brand-text-muted px-1 rounded-full">
                     Coming Soon
                   </span>
                 )}

@@ -123,7 +123,7 @@ export default function OperationProgressModal({
                           className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
                           style={{
                             backgroundColor: isCompleted
-                              ? '#22C55E20'
+                              ? 'var(--color-status-success)'
                               : isCurrent
                                 ? `${brandColor}20`
                                 : 'var(--org-surface-elevated, #14141f)',

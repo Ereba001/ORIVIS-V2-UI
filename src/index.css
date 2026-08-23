@@ -198,12 +198,12 @@ body {
 
 /* -- Platform Console specific tokens -- */
 :root {
-  --orivis-gold: #C9A227;
-  --orivis-gold-light: #E5C158;
-  --orivis-gold-dark: #A4801B;
-  --orivis-dark-bg: #050507;
-  --orivis-card-bg: #101012;
-  --orivis-input-bg: #161619;
+  --orivis-gold: var(--color-brand-gold);
+  --orivis-gold-light: var(--color-brand-gold-hover);
+  --orivis-gold-dark: var(--color-brand-gold-pressed);
+  --orivis-dark-bg: var(--color-brand-bg);
+  --orivis-card-bg: var(--color-brand-surface);
+  --orivis-input-bg: var(--color-brand-surface-interactive);
 }
 
 .card-top-glow {
@@ -214,26 +214,26 @@ body {
 }
 
 .glass-input {
-  background-color: rgba(16, 16, 18, 0.6);
+  background-color: var(--glass-bg);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  box-shadow: inset 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-brand-sm);
 }
 
 .glass-input:focus {
   border-color: var(--orivis-gold);
   box-shadow: 
-    0 0 0 1px rgba(201, 162, 39, 0.3),
+    0 0 0 1px var(--glass-strong-border),
     inset 0 1px 2px 0 rgba(0, 0, 0, 0.4);
   outline: none;
 }
 
 .gold-glow {
-  box-shadow: 0 4px 20px 0 rgba(201, 162, 39, 0.25);
+  box-shadow: var(--shadow-brand-gold);
 }
 
 .gold-glow:hover {
-  box-shadow: 0 4px 25px 0 rgba(201, 162, 39, 0.4);
+  box-shadow: var(--shadow-brand-gold);
 }
 
 .text-orivis-gold { color: var(--orivis-gold); }
@@ -244,14 +244,14 @@ body {
 .border-orivis-gold { border-color: var(--orivis-gold); }
 
 .status-badge-default {
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.6);
+  background-color: var(--glass-bg);
+  border-color: var(--glass-border);
+  color: var(--color-brand-text-muted);
 }
 [data-theme="light"] .status-badge-default {
-  background-color: rgba(0, 0, 0, 0.06);
-  border-color: rgba(0, 0, 0, 0.12);
-  color: rgba(0, 0, 0, 0.5);
+  background-color: var(--glass-bg);
+  border-color: var(--glass-border);
+  color: var(--color-brand-text-muted);
 }
 
 button, .btn-like {

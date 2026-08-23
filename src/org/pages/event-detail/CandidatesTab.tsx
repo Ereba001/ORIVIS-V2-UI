@@ -275,7 +275,7 @@ export function CandidatesTab({ event, positions, locked, onDataChanged }: { eve
 
       {toast && (
         <div className="fixed bottom-6 right-6 z-[100] animate-in slide-in-from-bottom-4 fade-in duration-300">
-          <div className={`flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl border text-xs font-medium ${toast.type === 'error' ? 'bg-red-500/10 border-red-500/30 text-red-600' : toast.type === 'success' ? 'bg-green-500/10 border-green-500/30 text-green-600' : 'bg-blue-500/10 border-blue-500/30 text-blue-600'}`}>
+          <div className={`flex items-center gap-2 px-4 py-3 rounded-xl shadow-xl border text-xs font-medium ${toast.type === 'error' ? 'bg-status-danger/10 border-status-danger/30 text-status-danger' : toast.type === 'success' ? 'bg-status-success/10 border-status-success/30 text-status-success' : 'bg-status-info/10 border-status-info/30 text-status-info'}`}>
             {toast.type === 'error' ? <XCircle size={14} /> : toast.type === 'success' ? <CheckCircle size={14} /> : <AlertTriangle size={14} />}
             <span className="whitespace-pre-line">{toast.message}</span>
             <button onClick={() => setToast(null)} className="ml-2 p-0.5 rounded hover:bg-black/5"><X size={12} /></button>
@@ -288,7 +288,7 @@ export function CandidatesTab({ event, positions, locked, onDataChanged }: { eve
             <p className="text-xs text-brand-text-primary mb-6">{confirmDialog.message}</p>
             <div className="flex justify-end gap-2">
               <button onClick={() => setConfirmDialog(null)} className="px-4 py-2 rounded-xl text-[10px] font-bold border border-brand-border text-brand-text-muted hover:bg-brand-surface-interactive transition-all">Cancel</button>
-              <button onClick={async () => { const action = confirmDialog.onConfirm; setConfirmDialog(null); await action(); }} className="px-4 py-2 rounded-xl text-[10px] font-bold bg-red-500 text-white hover:bg-red-600 transition-all">Confirm</button>
+              <button onClick={async () => { const action = confirmDialog.onConfirm; setConfirmDialog(null); await action(); }} className="px-4 py-2 rounded-xl text-[10px] font-bold bg-status-danger text-white hover:bg-status-danger-strong transition-all">Confirm</button>
             </div>
           </div>
         </div>

@@ -408,9 +408,9 @@ export default function PlatformDashboard() {
               {(() => {
                 const denom = Math.max(1, dashboard.subscriptions.total)
                 const rows = [
-                  { label: 'Active', value: dashboard.subscriptions.active, color: '#22C55E' },
-                  { label: 'Trial —', value: dashboard.subscriptions.trialing, color: '#F59F0B' },
-                  { label: 'Expired / Churned', value: dashboard.subscriptions.expired, color: '#EF4444' },
+                  { label: 'Active', value: dashboard.subscriptions.active, color: 'var(--color-status-success)' },
+                   { label: 'Trial —', value: dashboard.subscriptions.trialing, color: 'var(--color-status-warning)' },
+                   { label: 'Expired / Churned', value: dashboard.subscriptions.expired, color: 'var(--color-status-danger)' },
                 ]
                 return (
                   <div className="space-y-3">

@@ -42,6 +42,20 @@ const NAV_ITEMS = [
   { label: 'Help & Support', path: '/org/help', icon: WorkspaceHelpIcon },
 ]
 
+const AEC_PATH = '/org/assisted-election-centre'
+
+function getVisibleNavItems(assistedEventsEnabled: boolean) {
+  return NAV_ITEMS.filter(item => item.path !== AEC_PATH || assistedEventsEnabled)
+}
+
+function getManageItems(visible: typeof NAV_ITEMS) {
+  return visible.filter(item => NAV_ITEMS.indexOf(item) < 7)
+}
+
+function getAdminItems(visible: typeof NAV_ITEMS) {
+  return visible.filter(item => NAV_ITEMS.indexOf(item) >= 7)
+}
+
 function formatOrgCategory(type: string | undefined | null): string {
   if (!type) return 'Organization'
   const cleaned = type
@@ -62,7 +76,7 @@ function OrgLogoAvatar({ branding, className = '', iconClassName = 'text-[10px]'
   return (
     <div
       className={`rounded-lg flex items-center justify-center font-bold shrink-0 overflow-hidden ${className}`}
-      style={{ backgroundColor: showImage ? 'transparent' : branding.primaryColor, color: showImage ? undefined : '#FFFFFF' }}
+      style={{ backgroundColor: showImage ? 'transparent' : branding.primaryColor, color: showImage ? undefined : 'var(--color-brand-text-primary)' }}
     >
       {showImage ? (
         <img
@@ -81,7 +95,7 @@ function OrgLogoAvatar({ branding, className = '', iconClassName = 'text-[10px]'
 export default function OrgLayout() {
   const navigate = useNavigate()
   const location = useLocation()
-  const { branding, admin, isLoaded, status: brandingStatus, retry: retryBranding } = useOrgBranding()
+  const { branding, admin, isLoaded, status: brandingStatus, retry: retryBranding, assistedEventsEnabled } = useOrgBranding()
   const { logout } = useAuth()
   const {
     notifications: ORG_NOTIFICATIONS,
@@ -264,7 +278,7 @@ export default function OrgLayout() {
       </AnimatePresence>
 
       {brandingStatus === 'error' && (
-        <div className="fixed top-0 inset-x-0 z-[180] bg-red-600 text-white text-xs font-medium px-4 py-2 flex items-center justify-between gap-3">
+        <div className="fixed top-0 inset-x-0 z-[180] bg-status-danger text-brand-text-primary text-xs font-medium px-4 py-2 flex items-center justify-between gap-3">
           <span className="flex items-center gap-2">
             <AlertCircle size={14} />
             Workspace branding could not be loaded. Showing default settings.
@@ -530,6 +544,7 @@ export default function OrgLayout() {
               location={location}
               navigate={navigate}
               onClose={() => setMobileOpen(false)}
+              navItems={getVisibleNavItems(assistedEventsEnabled)}
             />
           </motion.aside>
         )}
@@ -549,6 +564,7 @@ export default function OrgLayout() {
           navigate={navigate}
           collapsed={sidebarCollapsed}
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+          navItems={getVisibleNavItems(assistedEventsEnabled)}
         />
       </aside>
 
@@ -907,9 +923,11 @@ function Building2Icon({ size = 10 }: { size?: number }) {
   )
 }
 
-function DesktopSidebarContent({ branding, admin, location, navigate, collapsed, onToggleCollapse }: {
-  branding: any; admin: any; location: any; navigate: any; collapsed: boolean; onToggleCollapse: () => void
+function DesktopSidebarContent({ branding, admin, location, navigate, collapsed, onToggleCollapse, navItems }: {
+  branding: any; admin: any; location: any; navigate: any; collapsed: boolean; onToggleCollapse: () => void; navItems: typeof NAV_ITEMS
 }) {
+  const manageItems = getManageItems(navItems)
+  const adminItems = getAdminItems(navItems)
   return (
     <>
       <div className={`px-4 py-2 border-b border-brand-divider ${collapsed ? 'hidden' : ''}`}>
@@ -923,7 +941,7 @@ function DesktopSidebarContent({ branding, admin, location, navigate, collapsed,
         {!collapsed && (
           <p className="px-4 pt-4 pb-1 text-[10px] font-semibold uppercase tracking-wider text-brand-text-disabled">Manage</p>
         )}
-        {NAV_ITEMS.slice(0, 7).map((item) => {
+        {manageItems.map((item) => {
           const Icon = item.icon
           const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/')
 
@@ -960,7 +978,7 @@ function DesktopSidebarContent({ branding, admin, location, navigate, collapsed,
         {!collapsed && (
           <p className="px-4 pt-4 pb-1 text-[10px] font-semibold uppercase tracking-wider text-brand-text-disabled">Administration</p>
         )}
-        {NAV_ITEMS.slice(7).map((item) => {
+        {adminItems.map((item) => {
           const Icon = item.icon
           const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/')
 
@@ -1029,9 +1047,11 @@ function DesktopSidebarContent({ branding, admin, location, navigate, collapsed,
   )
 }
 
-function MobileSidebarContent({ branding, admin, location, navigate, onClose }: {
-  branding: any; admin: any; location: any; navigate: any; onClose: () => void
+function MobileSidebarContent({ branding, admin, location, navigate, onClose, navItems }: {
+  branding: any; admin: any; location: any; navigate: any; onClose: () => void; navItems: typeof NAV_ITEMS
 }) {
+  const manageItems = getManageItems(navItems)
+  const adminItems = getAdminItems(navItems)
   return (
     <>
       <div className="flex items-center justify-end px-4 py-4 border-b border-brand-divider">
@@ -1041,7 +1061,7 @@ function MobileSidebarContent({ branding, admin, location, navigate, onClose }: 
       </div>
       <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
         <p className="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-brand-text-disabled">Manage</p>
-        {NAV_ITEMS.slice(0, 7).map((item) => {
+        {manageItems.map((item) => {
           const Icon = item.icon
           const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/')
 
@@ -1073,7 +1093,7 @@ function MobileSidebarContent({ branding, admin, location, navigate, onClose }: 
           )
         })}
         <p className="px-3 pt-3 pb-1 text-[10px] font-semibold uppercase tracking-wider text-brand-text-disabled">Administration</p>
-        {NAV_ITEMS.slice(7).map((item) => {
+        {adminItems.map((item) => {
           const Icon = item.icon
           const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/')
 

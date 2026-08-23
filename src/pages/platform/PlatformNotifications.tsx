@@ -17,10 +17,10 @@ const TYPE_CONFIG: Record<
   PlatformNotificationType,
   { icon: typeof Bell; color: string; bg: string; label: string }
 > = {
-  ORG_REGISTRATION: { icon: Building2, color: "text-blue-400", bg: "bg-blue-400/10", label: "Registration" },
-  EVENT_PUBLISH_REQUEST: { icon: ScrollText, color: "text-purple-400", bg: "bg-purple-400/10", label: "Event" },
-  SUBSCRIPTION_ALERT: { icon: CreditCard, color: "text-cyan-400", bg: "bg-cyan-400/10", label: "Subscription" },
-  SECURITY_ALERT: { icon: Shield, color: "text-red-400", bg: "bg-red-400/10", label: "Security" },
+  ORG_REGISTRATION: { icon: Building2, color: "text-status-info", bg: "bg-status-info/10", label: "Registration" },
+  EVENT_PUBLISH_REQUEST: { icon: ScrollText, color: "text-status-warning", bg: "bg-status-warning/10", label: "Event" },
+  SUBSCRIPTION_ALERT: { icon: CreditCard, color: "text-status-info", bg: "bg-status-info/10", label: "Subscription" },
+  SECURITY_ALERT: { icon: Shield, color: "text-status-danger", bg: "bg-status-danger/10", label: "Security" },
   PLATFORM_ANNOUNCEMENT: { icon: Megaphone, color: "text-brand-gold", bg: "bg-brand-gold/10", label: "Announcement" },
 }
 

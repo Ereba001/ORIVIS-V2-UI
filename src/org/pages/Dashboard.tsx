@@ -30,11 +30,11 @@ import SeoHead from "../../components/SeoHead"
 type DashboardState = 'loading' | 'loaded' | 'empty' | 'error'
 
 const STATUS_COLORS: Record<string, string> = {
-  live: '#22C55E',
-  published: '#F59E0B',
-  ready: '#8B5CF6',
-  draft: '#94A3B8',
-  completed: '#3B82F6',
+  live: 'var(--color-event-live)',
+  published: 'var(--color-status-warning)',
+  ready: 'var(--color-event-upcoming)',
+  draft: 'var(--color-brand-text-muted)',
+  completed: 'var(--color-event-completed)',
 }
 
 const QUICK_ACTIONS = [

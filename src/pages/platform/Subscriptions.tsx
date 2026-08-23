@@ -118,7 +118,7 @@ export default function PlatformSubscriptions() {
           voters: voters == null ? "Unlimited" : Number(voters),
           events: events == null ? "Unlimited" : Number(events),
           icon: p.slug === "enterprise" ? Gem : p.slug === "free" ? Rocket : p.slug === "single-election" ? Briefcase : Crown,
-          color: p.slug === "free" ? "text-brand-text-muted" : p.slug === "single-election" ? "text-blue-400" : p.slug === "enterprise" ? "text-purple-400" : "text-brand-gold",
+          color: p.slug === "free" ? "text-brand-text-muted" : p.slug === "single-election" ? "text-status-info" : p.slug === "enterprise" ? "text-status-info" : "text-brand-gold",
           popular: i === 1,
         }
       })
@@ -189,9 +189,9 @@ export default function PlatformSubscriptions() {
   const statsItems = useMemo(
     () => [
       { label: "Active Plans", value: String(counts.active), icon: CheckCircle2, color: "text-status-success" },
-      { label: "Trial Organizations", value: String(counts.trial), icon: FlaskConical, color: "text-blue-400" },
+      { label: "Trial Organizations", value: String(counts.trial), icon: FlaskConical, color: "text-status-info" },
       { label: "Expiring This Month", value: String(counts.expiring), icon: Clock, color: "text-status-warning" },
-      { label: "Renewals This Month", value: String(counts.renewed), icon: RefreshCw, color: "text-cyan-400" },
+      { label: "Renewals This Month", value: String(counts.renewed), icon: RefreshCw, color: "text-status-info" },
       { label: "Suspended", value: String(counts.suspended), icon: PauseCircle, color: "text-status-error" },
       { label: "Cancelled", value: String(counts.cancelled), icon: XCircle, color: "text-brand-text-muted" },
     ],
@@ -275,7 +275,7 @@ export default function PlatformSubscriptions() {
           className="glass-card rounded-2xl p-5 border border-brand-border"
         >
           <div className="flex items-center gap-2 mb-2">
-            <RefreshCw size={14} className="text-cyan-400" />
+            <RefreshCw size={14} className="text-status-info" />
             <span className="text-[10px] font-mono uppercase tracking-wider text-brand-text-muted font-bold">Renewals Next 30 Days</span>
           </div>
           <p className="text-2xl font-bold font-mono text-brand-text-primary">{forecast.next30Renewals}</p>
@@ -287,7 +287,7 @@ export default function PlatformSubscriptions() {
           className="glass-card rounded-2xl p-5 border border-brand-border"
         >
           <div className="flex items-center gap-2 mb-2">
-            <Calendar size={14} className="text-amber-400" />
+            <Calendar size={14} className="text-status-warning" />
             <span className="text-[10px] font-mono uppercase tracking-wider text-brand-text-muted font-bold">Renewals Next 90 Days</span>
           </div>
           <p className="text-2xl font-bold font-mono text-brand-text-primary">{forecast.next90Renewals}</p>
@@ -299,7 +299,7 @@ export default function PlatformSubscriptions() {
           className="glass-card rounded-2xl p-5 border border-brand-border"
         >
           <div className="flex items-center gap-2 mb-2">
-            <TrendingUp size={14} className="text-emerald-400" />
+            <TrendingUp size={14} className="text-status-success" />
             <span className="text-[10px] font-mono uppercase tracking-wider text-brand-text-muted font-bold">Projected Revenue Next Month</span>
           </div>
           <p className="text-2xl font-bold font-mono text-brand-text-primary">{formatMoney(forecast.projectedMonthly, forecast.currency)}</p>
@@ -440,7 +440,7 @@ export default function PlatformSubscriptions() {
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[10px] font-mono text-brand-text-muted">
           <span><span className="font-bold text-status-success">{counts.active}</span> Active</span>
           <span className="hidden sm:inline w-px h-3 bg-brand-border/50" />
-          <span><span className="font-bold text-blue-400">{counts.trial}</span> Trial</span>
+          <span><span className="font-bold text-status-info">{counts.trial}</span> Trial</span>
           <span className="hidden sm:inline w-px h-3 bg-brand-border/50" />
           <span><span className="font-bold text-status-warning">{counts.expiring}</span> Expiring</span>
           <span className="hidden sm:inline w-px h-3 bg-brand-border/50" />
@@ -592,7 +592,7 @@ export default function PlatformSubscriptions() {
                       {renewals.map((r) => (
                         <div key={r.id} className="flex items-center justify-between py-2 border-b border-brand-border last:border-0">
                           <div className="flex items-center gap-2">
-                            <RefreshCw size={12} className="text-cyan-400" />
+                            <RefreshCw size={12} className="text-status-info" />
                             <span className="text-xs text-brand-text-primary">Renewed</span>
                           </div>
                           <span className="text-[10px] font-mono text-brand-text-muted">

@@ -54,8 +54,8 @@ export default function ActionSuccessModal({
           >
             <div className="flex items-start justify-between gap-3 p-6 pb-4">
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-emerald-500/18">
-                  <CheckCircle size={18} className="text-emerald-500" />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 bg-status-success/10">
+                  <CheckCircle size={18} className="text-status-success" />
                 </div>
                 <h2 className="text-sm font-bold text-brand-text-primary leading-tight">{title}</h2>
               </div>

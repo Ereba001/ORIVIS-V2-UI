@@ -235,12 +235,12 @@ export function PublishingTab({ event, publicUrl, onShowQrModal, onDataChanged }
             <p className="text-[11px] text-brand-text-muted mt-0.5">Complete all checks before publishing this event to participants.</p>
           </div>
           <div className="text-right">
-            <p className="text-2xl font-bold" style={{ color: allComplete ? '#22C55E' : pColor }}>{percentage}%</p>
+            <p className="text-2xl font-bold" style={{ color: allComplete ? 'var(--color-status-success)' : pColor }}>{percentage}%</p>
             <p className="text-[9px] text-brand-text-muted ">{completedCount} of {totalCount} checks passed</p>
           </div>
         </div>
 
-        <ProgressBar value={completedCount} max={totalCount} color={allComplete ? '#22C55E' : pColor} showLabel={false} />
+        <ProgressBar value={completedCount} max={totalCount} color={allComplete ? 'var(--color-status-success)' : pColor} showLabel={false} />
 
         {Object.keys(groupedFailed).length > 0 && (
           <div className="mt-4 p-3 rounded-xl bg-status-warning/10 border border-status-warning/20">
@@ -339,13 +339,13 @@ export function PublishingTab({ event, publicUrl, onShowQrModal, onDataChanged }
                   <p className="text-[10px] text-status-error font-medium">{publishError}</p>
                 </div>
               )}
-              <div className="flex items-center gap-3 p-4 rounded-xl bg-blue-500/10 border border-blue-500/20">
-                <CalendarClock size={20} className="text-blue-500" />
+              <div className="flex items-center gap-3 p-4 rounded-xl bg-status-info/10 border border-status-info/20">
+                <CalendarClock size={20} className="text-status-info" />
                 <div className="flex-1">
-                  <p className="text-xs font-bold text-blue-500">Publish Scheduled</p>
+                  <p className="text-xs font-bold text-status-info">Publish Scheduled</p>
                   <p className="text-[10px] text-brand-text-muted mt-0.5">This event will be automatically published at {formatScheduledAt(scheduledAt)}.</p>
                 </div>
-                <button onClick={handleCancelSchedule} className="p-1.5 rounded-lg hover:bg-blue-500/10 text-blue-500" title="Cancel schedule">
+                <button onClick={handleCancelSchedule} className="p-1.5 rounded-lg hover:bg-status-info/10 text-status-info" title="Cancel schedule">
                   <X size={14} />
                 </button>
               </div>

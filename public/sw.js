@@ -49,6 +49,14 @@ self.addEventListener('fetch', (event) => {
           caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
         }
         return response;
+      }).catch(() => {
+        // Network failure: return cached version if available, otherwise
+        // a lightweight offline page so the SW never throws an unhandled
+        // promise rejection.
+        return cached || new Response('Offline', {
+          status: 503,
+          headers: { 'Content-Type': 'text/plain' },
+        });
       });
       return cached || fetched;
     })

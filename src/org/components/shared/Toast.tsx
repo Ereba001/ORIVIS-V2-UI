@@ -30,9 +30,9 @@ const TOAST_STYLES: Record<string, { bg: string; border: string; text: string; I
     Icon: AlertTriangle,
   },
   info: {
-    bg: 'bg-blue-400/10',
-    border: 'border-blue-400/20',
-    text: 'text-blue-400',
+    bg: 'bg-status-info/10',
+    border: 'border-status-info/20',
+    text: 'text-status-info',
     Icon: Info,
   },
 }

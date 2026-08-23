@@ -319,7 +319,7 @@ export default function LiveResults() {
                             <div className="w-full h-1.5 bg-brand-surface-elevated rounded-full overflow-hidden mt-1.5">
                               <div
                                 className="h-full rounded-full transition-all duration-700"
-                                style={{ width: `${share}%`, backgroundColor: isLeader ? '#22C55E' : pColor }}
+                                style={{ width: `${share}%`, backgroundColor: isLeader ? 'var(--color-status-success)' : pColor }}
                               />
                             </div>
                           </div>

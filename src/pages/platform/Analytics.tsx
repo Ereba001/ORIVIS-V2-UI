@@ -26,9 +26,9 @@ export default function Analytics() {
 
   const STATS = [
     { label: "Total Votes Cast", value: stats ? fmt(stats.votes.total) : "—", change: `${voteChange >= 0 ? "+" : ""}${voteChange.toFixed(1)}% vs last month`, icon: Vote, color: "text-brand-gold" },
-    { label: "Verified Participants", value: stats ? fmt(stats.voters.verified) : "—", change: stats?.voters.total ? `of ${fmt(stats.voters.total)} registered` : "No registered participants", icon: Users, color: "text-blue-400" },
-    { label: "Avg. Turnout Rate", value: stats ? `${stats.turnout}%` : "—", change: "cast votes per registered voter", icon: TrendingUp, color: "text-green-400" },
-    { label: "Events Completed", value: stats ? fmt(stats.electionsCompleted) : "—", change: breakdown ? `${breakdown.live} live · ${breakdown.active} published` : "", icon: BarChart3, color: "text-purple-400" },
+    { label: "Verified Participants", value: stats ? fmt(stats.voters.verified) : "—", change: stats?.voters.total ? `of ${fmt(stats.voters.total)} registered` : "No registered participants", icon: Users, color: "text-status-info" },
+    { label: "Avg. Turnout Rate", value: stats ? `${stats.turnout}%` : "—", change: "cast votes per registered voter", icon: TrendingUp, color: "text-status-success" },
+    { label: "Events Completed", value: stats ? fmt(stats.electionsCompleted) : "—", change: breakdown ? `${breakdown.live} live · ${breakdown.active} published` : "", icon: BarChart3, color: "text-status-info" },
   ]
 
   const maxGrowth = Math.max(1, ...growth.map((g) => g.organizations), ...growth.map((g) => g.users), ...growth.map((g) => g.votes))
@@ -119,7 +119,7 @@ export default function Analytics() {
             <div className="space-y-4">
               {devices.map((d) => {
                 const icon = d.label === "Desktop" ? Monitor : d.label === "Tablet" ? Globe : Smartphone
-                const color = d.label === "Desktop" ? "bg-brand-gold" : d.label === "Tablet" ? "bg-green-400" : "bg-blue-400"
+                const color = d.label === "Desktop" ? "bg-brand-gold" : d.label === "Tablet" ? "bg-status-success" : "bg-status-info"
                 const Icon = icon
                 return (
                   <div key={d.label}>
@@ -150,8 +150,8 @@ export default function Analytics() {
                 <span className="text-[10px] font-mono text-brand-text-muted w-8">{d.month}</span>
                 <div className="flex-1 flex items-center gap-1">
                   <div className="h-3 rounded-sm bg-brand-gold/30" style={{ width: `${(d.organizations / maxGrowth) * 100}%` }} title={`${d.organizations} organizations`} />
-                  <div className="h-3 rounded-sm bg-blue-400/30" style={{ width: `${(d.users / maxGrowth) * 100}%` }} title={`${d.users} users`} />
-                  <div className="h-3 rounded-sm bg-green-400/30" style={{ width: `${(d.votes / maxGrowth) * 100}%` }} title={`${d.votes} votes`} />
+                  <div className="h-3 rounded-sm bg-status-info/30" style={{ width: `${(d.users / maxGrowth) * 100}%` }} title={`${d.users} users`} />
+                  <div className="h-3 rounded-sm bg-status-success/30" style={{ width: `${(d.votes / maxGrowth) * 100}%` }} title={`${d.votes} votes`} />
                 </div>
                 <span className="text-[9px] font-mono text-brand-text-muted">{d.organizations}</span>
               </div>
@@ -159,8 +159,8 @@ export default function Analytics() {
           </div>
           <div className="flex items-center gap-4 mt-4 pt-3 border-t border-brand-border text-[9px] font-mono text-brand-text-muted">
             <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-brand-gold/60" /> Organizations</span>
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-blue-400/60" /> Users</span>
-            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-green-400/60" /> Votes</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-status-info/60" /> Users</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded bg-status-success/60" /> Votes</span>
           </div>
         </div>
 

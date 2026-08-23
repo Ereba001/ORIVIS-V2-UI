@@ -6,7 +6,7 @@ import { electionService } from '../../../services/election-service'
 import { type OrivisEvent, timeAgo } from './_shared'
 
 const SEVERITY_STYLES: Record<string, string> = {
-  info: 'bg-blue-400/10 text-blue-400 border-blue-400/20',
+  info: 'bg-status-info/10 text-status-info border-status-info/20',
   warning: 'bg-status-warning/10 text-status-warning border-status-warning/20',
   critical: 'bg-status-error/10 text-status-error border-status-error/20',
 }

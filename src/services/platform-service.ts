@@ -47,9 +47,9 @@ function timeAgo(value: string): string {
 
 const QUICK_ACTIONS: DashboardQuickAction[] = [
   { id: 'q1', label: 'View Organizations', description: 'Monitor active organizations', icon: 'Building2', path: '/platform/organizations', color: 'text-brand-gold' },
-  { id: 'q2', label: 'View Reports', description: 'Analytics and platform reports', icon: 'BarChart3', path: '/platform/analytics', color: 'text-blue-400' },
+  { id: 'q2', label: 'View Reports', description: 'Analytics and platform reports', icon: 'BarChart3', path: '/platform/analytics', color: 'text-status-info' },
   { id: 'q3', label: 'View Subscriptions', description: 'Billing and subscription plans', icon: 'CreditCard', path: '/platform/subscriptions', color: 'text-brand-text-muted' },
-  { id: 'q4', label: 'System Settings', description: 'Configure platform preferences', icon: 'SlidersHorizontal', path: '/platform/settings', color: 'text-purple-400' },
+  { id: 'q4', label: 'System Settings', description: 'Configure platform preferences', icon: 'SlidersHorizontal', path: '/platform/settings', color: 'text-status-info' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -975,9 +975,9 @@ export const platformService = {
     })();
 
     const orgStatus = [
-      { name: 'Active', value: s.organizations.active, color: '#22C55E' },
-      { name: 'Suspended', value: s.organizations.suspended, color: '#EF4444' },
-      { name: 'Archived', value: s.organizations.archived, color: '#94A3B8' },
+      { name: 'Active', value: s.organizations.active, color: 'var(--color-status-success)' },
+      { name: 'Suspended', value: s.organizations.suspended, color: 'var(--color-status-danger)' },
+      { name: 'Archived', value: s.organizations.archived, color: 'var(--color-brand-text-muted)' },
     ].filter((d) => d.value > 0);
 
     return {

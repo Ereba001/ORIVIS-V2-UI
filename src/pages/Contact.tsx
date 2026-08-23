@@ -152,7 +152,7 @@ export default function Contact() {
                       className="w-full bg-brand-surface border border-brand-border rounded-xl px-4 py-3 text-xs text-brand-text-primary placeholder-brand-text-disabled focus:outline-none focus:border-brand-gold transition-all resize-none"
                     />
                     {formError && (
-                      <div className="flex items-center gap-2 text-red-400 text-xs bg-red-400/10 border border-red-400/20 rounded-xl px-4 py-3">
+                      <div className="flex items-center gap-2 text-status-danger text-xs bg-status-danger/10 border border-status-danger/20 rounded-xl px-4 py-3">
                         <AlertCircle size={14} className="shrink-0" />
                         <span>{formError}</span>
                       </div>

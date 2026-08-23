@@ -703,7 +703,7 @@ export default function AssistedElectionCentre() {
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
-                  className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2 text-xs text-red-600"
+                  className="flex items-center gap-2 bg-status-danger/10 border border-status-danger/20 rounded-xl px-3 py-2 text-xs text-status-danger"
                 >
                   <AlertCircle size={14} /> {error}
                   <button onClick={() => setError(null)} className="ml-auto cursor-pointer">
@@ -806,7 +806,7 @@ export default function AssistedElectionCentre() {
                   setConfirmLoading(false)
                   setView('confirming')
                 }}
-                className="text-[10px] font-semibold text-amber-600 hover:text-amber-700 transition-colors cursor-pointer flex items-center gap-1 border border-amber-300 rounded-lg px-2 py-1"
+                className="text-[10px] font-semibold text-status-warning hover:text-status-warning-strong transition-colors cursor-pointer flex items-center gap-1 border border-status-warning/30 rounded-lg px-2 py-1"
               >
                 <Shield size={11} /> Bypass Verification
               </button>
@@ -818,7 +818,7 @@ export default function AssistedElectionCentre() {
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -8 }}
-                  className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2 text-xs text-red-600"
+                  className="flex items-center gap-2 bg-status-danger/10 border border-status-danger/20 rounded-xl px-3 py-2 text-xs text-status-danger"
                 >
                   <AlertCircle size={14} /> {error}
                   <button onClick={() => setError(null)} className="ml-auto cursor-pointer">
@@ -840,8 +840,8 @@ export default function AssistedElectionCentre() {
                     </div>
                     <div className="flex items-center gap-3 mt-1 flex-wrap">
                       <span className="text-[9px] text-brand-text-muted">Status: {election.registration_status.replace(/_/g, ' ')}</span>
-                      {election.has_voted && <span className="text-[9px] text-emerald-600 font-medium">Voted</span>}
-                      {election.has_active_pass && <span className="text-[9px] text-blue-600 font-medium">Active pass</span>}
+                      {election.has_voted && <span className="text-[9px] text-status-success font-medium">Voted</span>}
+                      {election.has_active_pass && <span className="text-[9px] text-status-info font-medium">Active pass</span>}
                     </div>
                   </div>
                 )
@@ -982,8 +982,8 @@ export default function AssistedElectionCentre() {
             </div>
           </div>
           <div className="bg-brand-surface rounded-xl border border-brand-border p-6 text-center">
-            <div className="mx-auto h-12 w-12 rounded-full bg-red-500/10 flex items-center justify-center mb-3">
-              <AlertCircle size={24} className="text-red-500" />
+            <div className="mx-auto h-12 w-12 rounded-full bg-status-danger/10 flex items-center justify-center mb-3">
+              <AlertCircle size={24} className="text-status-danger" />
             </div>
             <p className="text-sm font-semibold text-brand-text-primary mb-1">{error || 'An unexpected error occurred'}</p>
             <p className="text-xs text-brand-text-muted mb-4">Please try again or contact support if the problem persists.</p>

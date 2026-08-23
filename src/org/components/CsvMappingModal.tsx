@@ -564,7 +564,7 @@ export default function CsvMappingModal({ open, onClose, onConfirm, expectedHead
                   onClick={() => setStep('confirm')}
                   disabled={missingRequired.length > 0 || duplicateMappings.length > 0}
                   className="px-4 py-2 text-[11px] font-bold uppercase tracking-wider rounded-xl text-white transition-colors cursor-pointer disabled:opacity-40"
-                  style={{ backgroundColor: missingRequired.length > 0 || duplicateMappings.length > 0 ? '#6b7280' : pColor }}
+                  style={{ backgroundColor: missingRequired.length > 0 || duplicateMappings.length > 0 ? 'var(--color-brand-gold-disabled)' : pColor }}
                   aria-disabled={missingRequired.length > 0 || duplicateMappings.length > 0}
                 >
                   Review

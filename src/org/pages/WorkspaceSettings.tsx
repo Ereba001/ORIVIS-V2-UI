@@ -205,7 +205,7 @@ export default function OrgWorkspaceSettings() {
           </div>
           <button onClick={handleSave} disabled={saving}
             className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all text-white disabled:opacity-50 w-full sm:w-auto"
-            style={{ backgroundColor: saved ? '#22C55E' : pColor }}>
+            style={{ backgroundColor: saved ? 'var(--color-status-success)' : pColor }}>
             {saving ? 'Saving...' : saved ? 'Saved!' : 'Save'}
           </button>
         </div>

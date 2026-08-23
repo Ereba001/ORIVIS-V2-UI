@@ -95,6 +95,7 @@ export default function SignIn({ onSuccess, variant, compact }: SignInProps) {
             id="email"
             type="email"
             required
+            autoComplete="username"
             placeholder="Enter your registered email address"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -111,6 +112,7 @@ export default function SignIn({ onSuccess, variant, compact }: SignInProps) {
               id="password"
               type={showPassword ? "text" : "password"}
               required
+              autoComplete="current-password"
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
