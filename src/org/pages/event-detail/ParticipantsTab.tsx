@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment, useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'motion/react'
 import {
@@ -10,9 +10,11 @@ import { useOrgBranding } from '../../contexts/OrgBrandingContext'
 import DashboardCard from '../../components/DashboardCard'
 import EmptyState from '../../components/EmptyState'
 import CsvMappingModal from '../../components/CsvMappingModal'
+import CapacityUpgradeDialog, { type CapacityUpgradeData } from '../../components/CapacityUpgradeDialog'
 import { API } from '../../../constants/api'
 import { getApiClient, unwrapPayload } from '../../../lib/api-client'
 import { eventService } from '../../services/event-service'
+import { billingService } from '../../../services/billing-service'
 import { type OrivisEvent, type EventParticipant, PARTICIPANT_REG_STYLES, VERIFICATION_STYLES, PASS_STYLES } from './_shared'
 import { resolveParticipantFields, hasParticipantData, participantFieldValue } from '../../../lib/participant-fields'
 import type { RegistrationSettings } from '../../../types/registration'
@@ -50,6 +52,29 @@ export function ParticipantsTab({ event, participants, registrationSettings, loc
   const [importing, setImporting] = useState(false)
   const [importResult, setImportResult] = useState<{ success: number; failed: number } | null>(null)
   const [clearing, setClearing] = useState(false)
+  const [capacityUpgradeData, setCapacityUpgradeData] = useState<CapacityUpgradeData | null>(null)
+  const [pendingImportParams, setPendingImportParams] = useState<{ mapping: Record<string, string>; records: Record<string, string>[] } | null>(null)
+  const [pendingAddPayload, setPendingAddPayload] = useState<Record<string, string> | null>(null)
+
+  // Handle payment return after capacity upgrade redirect.
+  const PENDING_PAYMENT_KEY = 'orivis_pending_payment'
+  const PENDING_UPGRADE_KEY = 'orivis_pending_capacity_upgrade'
+  useEffect(() => {
+    let cancelled = false
+    const pendingRaw = sessionStorage.getItem(PENDING_PAYMENT_KEY)
+    if (!pendingRaw) return
+    try {
+      const pending = JSON.parse(pendingRaw) as { electionId: string; paymentUuid: string }
+      if (pending.electionId !== event.id) return
+      sessionStorage.removeItem(PENDING_PAYMENT_KEY)
+      billingService.verifyPayment(pending.paymentUuid).then(() => {
+        if (cancelled) return
+        sessionStorage.removeItem(PENDING_UPGRADE_KEY)
+        onDataChanged?.()
+      }).catch(() => { /* payment verification failed; user can retry */ })
+    } catch { /* malformed storage; ignore */ }
+    return () => { cancelled = true }
+  }, [event.id])
 
   const filtered = participants.filter((p) => {
     if (regFilter !== 'all' && p.registrationStatus !== regFilter) return false
@@ -106,6 +131,7 @@ export function ParticipantsTab({ event, participants, registrationSettings, loc
     if (Object.keys(errors).length > 0) return
 
     setAdding(true)
+    let capacityBlocked = false
     try {
       const payload: Record<string, string> = {}
       for (const field of participantFields) {
@@ -119,9 +145,18 @@ export function ParticipantsTab({ event, participants, registrationSettings, loc
       setToast({ message: 'Participant added successfully.', type: 'success' })
       onDataChanged?.()
     } catch (err) {
-      setAddErrors({ name: err instanceof Error && err.message ? err.message : 'Failed to add participant.' })
+      const apiErr = err as Error & { code?: string | null; payload?: Record<string, unknown> }
+      if (apiErr.code === 'VOTER_CAPACITY_EXCEEDED' && apiErr.payload) {
+        setCapacityUpgradeData(apiErr.payload as unknown as CapacityUpgradeData)
+        setPendingAddPayload(addForm)
+        capacityBlocked = true
+        setShowAddModal(false)
+      } else {
+        setAddErrors({ name: err instanceof Error && err.message ? err.message : 'Failed to add participant.' })
+      }
     } finally {
       setAdding(false)
+      if (!capacityBlocked) setShowAddModal(false)
     }
   }
 
@@ -129,6 +164,7 @@ export function ParticipantsTab({ event, participants, registrationSettings, loc
     setImporting(true)
     setImportResult(null)
     setToast(null)
+    let capacityBlocked = false
     try {
       const headers = Object.keys(mapping)
       const csvLines = [headers.join(',')]
@@ -151,13 +187,21 @@ export function ParticipantsTab({ event, participants, registrationSettings, loc
       setToast({ message, type: 'success' })
       onDataChanged?.()
     } catch (err) {
-      setToast({
-        message: err instanceof Error && err.message ? err.message : 'CSV import failed. Please check the file format.',
-        type: 'error',
-      })
+      const apiErr = err as Error & { code?: string | null; payload?: Record<string, unknown> }
+      if (apiErr.code === 'VOTER_CAPACITY_EXCEEDED' && apiErr.payload) {
+        setCapacityUpgradeData(apiErr.payload as unknown as CapacityUpgradeData)
+        setPendingImportParams({ mapping, records })
+        capacityBlocked = true
+        setShowCsvModal(false)
+      } else {
+        setToast({
+          message: err instanceof Error && err.message ? err.message : 'CSV import failed. Please check the file format.',
+          type: 'error',
+        })
+      }
     } finally {
       setImporting(false)
-      setShowCsvModal(false)
+      if (!capacityBlocked) setShowCsvModal(false)
     }
   }
 
@@ -551,6 +595,41 @@ export function ParticipantsTab({ event, participants, registrationSettings, loc
         onConfirm={handleCsvImport}
         expectedHeaders={csvHeaders}
         requiredHeaders={csvRequired}
+      />
+
+      <CapacityUpgradeDialog
+        open={capacityUpgradeData !== null}
+        onClose={() => { setCapacityUpgradeData(null); setPendingImportParams(null); setPendingAddPayload(null) }}
+        electionId={event.id}
+        data={capacityUpgradeData ?? { ceiling: 0, current_participants: 0, incoming: 0, projected_participants: 0, excess: 0, currency: 'NGN' }}
+        onUpgraded={() => { setCapacityUpgradeData(null); onDataChanged?.() }}
+        onRetryImport={async () => {
+          if (pendingImportParams) {
+            const { mapping, records } = pendingImportParams
+            setPendingImportParams(null)
+            await handleCsvImport(mapping, records)
+          } else if (pendingAddPayload) {
+            setPendingAddPayload(null)
+            setShowAddModal(true)
+          }
+        }}
+        onTruncatedImport={async (trimTo) => {
+          // spec §5: import only the permitted number of valid participants
+          const data = capacityUpgradeData
+          if (pendingImportParams && data) {
+            const { mapping, records } = pendingImportParams
+            setPendingImportParams(null)
+            setCapacityUpgradeData(null)
+            const trimmedRecords = records.slice(0, Math.max(0, trimTo))
+            await handleCsvImport(mapping, trimmedRecords)
+          } else if (pendingAddPayload) {
+            setPendingAddPayload(null)
+            setCapacityUpgradeData(null)
+            setShowAddModal(true)
+          } else {
+            setCapacityUpgradeData(null)
+          }
+        }}
       />
 
       <AnimatePresence>

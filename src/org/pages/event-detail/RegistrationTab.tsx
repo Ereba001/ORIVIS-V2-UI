@@ -11,7 +11,9 @@ import ProgressBar from '../../components/ProgressBar'
 import RegistrationConfigSection, { createDefaultRegSettings } from '../../components/RegistrationConfigSection'
 import CsvMappingModal from '../../components/CsvMappingModal'
 import DirectVoteModal from '../../components/DirectVoteModal'
+import CapacityUpgradeDialog, { type CapacityUpgradeData } from '../../components/CapacityUpgradeDialog'
 import { electionService } from '../../../services/election-service'
+import { billingService } from '../../../services/billing-service'
 import { API } from '../../../constants/api'
 import { getApiClient, unwrapPayload } from '../../../lib/api-client'
 import { eventService, type EventParticipantData, type EventVoterSummary } from '../../services/event-service'
@@ -46,6 +48,9 @@ export function RegistrationTab({ event, registration, registrationSettings, par
   const [showStartModal, setShowStartModal] = useState(false)
   const [startNote, setStartNote] = useState('')
   const [startingReg, setStartingReg] = useState(false)
+  const [capacityUpgradeData, setCapacityUpgradeData] = useState<CapacityUpgradeData | null>(null)
+  const [pendingImportParams, setPendingImportParams] = useState<{ mapping: Record<string, string>; records: Record<string, string>[] } | null>(null)
+  const [pendingAddPayload, setPendingAddPayload] = useState<Record<string, string> | null>(null)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   const voterList = participants ?? []
@@ -62,6 +67,29 @@ export function RegistrationTab({ event, registration, registrationSettings, par
   }
   usePolling(refreshSummary, 15000, true)
   useEffect(() => { refreshSummary() }, [event.id])
+
+  // Handle payment return after capacity upgrade redirect.
+  const PENDING_PAYMENT_KEY = 'orivis_pending_payment'
+  const PENDING_UPGRADE_KEY = 'orivis_pending_capacity_upgrade'
+  useEffect(() => {
+    let cancelled = false
+    const pendingRaw = sessionStorage.getItem(PENDING_PAYMENT_KEY)
+    if (!pendingRaw) return
+    try {
+      const pending = JSON.parse(pendingRaw) as { electionId: string; paymentUuid: string }
+      if (pending.electionId !== event.id) return
+      sessionStorage.removeItem(PENDING_PAYMENT_KEY)
+      billingService.verifyPayment(pending.paymentUuid).then(() => {
+        if (cancelled) return
+        const upgradeRaw = sessionStorage.getItem(PENDING_UPGRADE_KEY)
+        if (upgradeRaw) {
+          sessionStorage.removeItem(PENDING_UPGRADE_KEY)
+          onDataChanged?.()
+        }
+      }).catch(() => { /* payment verification failed; user can retry */ })
+    } catch { /* malformed storage; ignore */ }
+    return () => { cancelled = true }
+  }, [event.id])
 
   const totalUploaded = summary?.total ?? voterList.length
   const totalRegistered = summary?.registered ?? voterList.filter((v) => v.registrationStatus === 'completed' || v.registrationStatus === 'verified').length
@@ -124,6 +152,7 @@ export function RegistrationTab({ event, registration, registrationSettings, par
     setImporting(true)
     setImportResult(null)
     setSaveError(null)
+    let capacityBlocked = false
     try {
       const headers = Object.keys(mapping)
       const csvLines = [headers.join(',')]
@@ -141,10 +170,18 @@ export function RegistrationTab({ event, registration, registrationSettings, par
       setImportResult({ success: result.successful, failed: result.failed })
       onDataChanged?.()
     } catch (err) {
-      setSaveError(err instanceof Error && err.message ? err.message : 'CSV import failed. Please check the file format.')
+      const apiErr = err as Error & { code?: string | null; payload?: Record<string, unknown> }
+      if (apiErr.code === 'VOTER_CAPACITY_EXCEEDED' && apiErr.payload) {
+        setCapacityUpgradeData(apiErr.payload as unknown as CapacityUpgradeData)
+        setPendingImportParams({ mapping, records })
+        capacityBlocked = true
+        setShowCsvModal(false)
+      } else {
+        setSaveError(err instanceof Error && err.message ? err.message : 'CSV import failed. Please check the file format.')
+      }
     } finally {
       setImporting(false)
-      setShowCsvModal(false)
+      if (!capacityBlocked) setShowCsvModal(false)
     }
   }
 
@@ -157,6 +194,7 @@ export function RegistrationTab({ event, registration, registrationSettings, par
     if (Object.keys(errors).length > 0) return
 
     setAdding(true)
+    let capacityBlocked = false
     try {
       const payload: Record<string, string> = {}
       for (const field of resolveParticipantFields(registrationSettings)) {
@@ -172,9 +210,18 @@ export function RegistrationTab({ event, registration, registrationSettings, par
       setShowAddModal(false)
       onDataChanged?.()
     } catch (err) {
-      setAddErrors({ name: err instanceof Error && err.message ? err.message : 'Failed to add participant.' })
+      const apiErr = err as Error & { code?: string | null; payload?: Record<string, unknown> }
+      if (apiErr.code === 'VOTER_CAPACITY_EXCEEDED' && apiErr.payload) {
+        setCapacityUpgradeData(apiErr.payload as unknown as CapacityUpgradeData)
+        setPendingAddPayload(addForm)
+        capacityBlocked = true
+        setShowAddModal(false)
+      } else {
+        setAddErrors({ name: err instanceof Error && err.message ? err.message : 'Failed to add participant.' })
+      }
     } finally {
       setAdding(false)
+      if (!capacityBlocked) setShowAddModal(false)
     }
   }
 
@@ -611,6 +658,40 @@ export function RegistrationTab({ event, registration, registrationSettings, par
         onConfirm={handleCsvImport}
         expectedHeaders={csvHeaders}
         requiredHeaders={csvRequired}
+      />
+
+      <CapacityUpgradeDialog
+        open={capacityUpgradeData !== null}
+        onClose={() => { setCapacityUpgradeData(null); setPendingImportParams(null); setPendingAddPayload(null) }}
+        electionId={event.id}
+        data={capacityUpgradeData ?? { ceiling: 0, current_participants: 0, incoming: 0, projected_participants: 0, excess: 0, currency: 'NGN' }}
+        onUpgraded={() => { setCapacityUpgradeData(null); onDataChanged?.() }}
+        onRetryImport={async () => {
+          if (pendingImportParams) {
+            const { mapping, records } = pendingImportParams
+            setPendingImportParams(null)
+            await handleCsvImport(mapping, records)
+          } else if (pendingAddPayload) {
+            setPendingAddPayload(null)
+            setShowAddModal(true)
+          }
+        }}
+        onTruncatedImport={async (trimTo) => {
+          const data = capacityUpgradeData
+          if (pendingImportParams && data) {
+            const { mapping, records } = pendingImportParams
+            setPendingImportParams(null)
+            setCapacityUpgradeData(null)
+            const trimmedRecords = records.slice(0, Math.max(0, trimTo))
+            await handleCsvImport(mapping, trimmedRecords)
+          } else if (pendingAddPayload) {
+            setPendingAddPayload(null)
+            setCapacityUpgradeData(null)
+            setShowAddModal(true)
+          } else {
+            setCapacityUpgradeData(null)
+          }
+        }}
       />
 
       <DirectVoteModal

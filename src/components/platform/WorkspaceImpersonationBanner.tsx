@@ -1,6 +1,6 @@
 import { motion } from 'motion/react'
 import { Eye, Shield, LogOut, AlertTriangle, Minimize2, Maximize2 } from 'lucide-react'
-import { usePlatformPermissions } from '../../contexts/PlatformPermissionsContext'
+import { useAuth } from '../../hooks/useAuth'
 import { useState } from 'react'
 
 interface WorkspaceImpersonationBannerProps {
@@ -15,8 +15,8 @@ interface WorkspaceImpersonationBannerProps {
  * Fixed to bottom-right corner with minimize/maximize toggle.
  */
 export default function WorkspaceImpersonationBanner({ organizationName, mode, onExit, exiting }: WorkspaceImpersonationBannerProps) {
-  const { staff } = usePlatformPermissions()
-  const staffName = staff?.name ?? 'Administrator'
+  const { user } = useAuth()
+  const staffName = user?.displayName ?? 'Administrator'
   const isAuditMode = mode === 'view_only'
   const [minimized, setMinimized] = useState(false)
 

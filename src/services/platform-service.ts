@@ -1346,8 +1346,10 @@ export const platformService = {
   // --- Elections ---
   async getElections(): Promise<PlatformElection[]> {
     const { data } = await getApiClient().get<unknown>(API.ENDPOINTS.PLATFORM.ELECTIONS);
-    const payload = unwrapPayload<Record<string, unknown>[]>(data);
-    return payload.map(mapElection);
+    const payload = unwrapPayload<Record<string, unknown>>(data);
+    // Backend returns { rows: [...] } — extract the rows array
+    const rows: unknown[] = Array.isArray(payload) ? payload : ((payload?.rows as unknown[]) ?? []);
+    return rows.map((row) => mapElection(row as Record<string, unknown>));
   },
 
   async approveElection(id: string): Promise<void> {
