@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'motion/react'
 import { AlertTriangle, ArrowUpCircle, Loader2, X, CheckCircle, Minus } from 'lucide-react'
 import { billingService } from '../../services/billing-service'
@@ -33,7 +33,7 @@ interface Props {
   onTruncatedImport?: (trimTo: number) => void
 }
 
-type Step = 'choose' | 'upgrade_processing' | 'upgrade_payment' | 'truncate_confirm' | 'truncate_processing' | 'error'
+type Step = 'choose' | 'upgrade_processing' | 'upgrade_payment' | 'truncate_confirm' | 'truncate_processing' | 'success' | 'error'
 
 const PENDING_IMPORT_KEY = 'orivis_pending_capacity_upgrade'
 
@@ -50,6 +50,16 @@ export default function CapacityUpgradeDialog({ open, onClose, onUpgraded, elect
   const clearPendingImport = useCallback(() => {
     try { sessionStorage.removeItem(PENDING_IMPORT_KEY) } catch { /* noop */ }
   }, [])
+
+  // Auto-close after showing success for 2 seconds.
+  const upgradedRef = useRef(false)
+  useEffect(() => {
+    if (step !== 'success') { upgradedRef.current = false; return }
+    if (upgradedRef.current) return
+    upgradedRef.current = true
+    const timer = setTimeout(() => onUpgraded(), 2000)
+    return () => clearTimeout(timer)
+  }, [step, onUpgraded])
 
   // --- Upgrade flow (spec §4) ---
   const handleUpgrade = useCallback(async () => {
@@ -90,7 +100,7 @@ export default function CapacityUpgradeDialog({ open, onClose, onUpgraded, elect
         console.error('Import failed after capacity upgrade:', importErr)
       }
       clearPendingImport()
-      onUpgraded()
+      setStep('success')
     } catch (err) {
       setStep('error')
       setError(err instanceof Error ? err.message : 'Upgrade failed. Please try again.')
@@ -269,6 +279,16 @@ export default function CapacityUpgradeDialog({ open, onClose, onUpgraded, elect
                     <AlertTriangle size={20} className="text-status-error" />
                   </div>
                   <p className="text-xs text-status-error text-center">{error}</p>
+                </div>
+              )}
+
+              {step === 'success' && (
+                <div className="flex flex-col items-center py-8 gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-status-success/10 flex items-center justify-center">
+                    <CheckCircle size={20} className="text-status-success" />
+                  </div>
+                  <p className="text-xs font-bold text-status-success">Upgrade & import complete</p>
+                  <p className="text-[10px] text-brand-text-muted">{data.incoming.toLocaleString('en-NG')} participants imported. Closing shortly…</p>
                 </div>
               )}
             </div>

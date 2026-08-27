@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* @vitest-environment jsdom */
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import CapacityUpgradeDialog, { type CapacityUpgradeData } from '../org/components/CapacityUpgradeDialog'
 
@@ -51,7 +51,8 @@ describe('CapacityUpgradeDialog — upgrade + import retry', () => {
     h.postImpl.mockClear()
   })
 
-  it('calls onRetryImport and awaits it before calling onUpgraded', async () => {
+  it('calls onRetryImport and shows success before auto-closing', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
     const onUpgraded = vi.fn()
     const onRetryImport = vi.fn(async () => { /* import succeeds */ })
     const onClose = vi.fn()
@@ -70,19 +71,24 @@ describe('CapacityUpgradeDialog — upgrade + import retry', () => {
     // Click "Move to Next Tier"
     fireEvent.click(screen.getByText('Move to Next Tier'))
 
-    // Wait for the upgrade + import retry to complete
-    await waitFor(() => expect(onUpgraded).toHaveBeenCalled())
+    // Wait for upgrade + import to complete and success state to appear
+    await waitFor(() => expect(screen.getByText('Upgrade & import complete')).toBeTruthy())
 
-    // onRetryImport MUST have been called
+    // onRetryImport was called
     expect(onRetryImport).toHaveBeenCalledTimes(1)
 
-    // onRetryImport must complete BEFORE onUpgraded
-    const retryCallOrder = onRetryImport.mock.invocationCallOrder[0]
-    const upgradedCallOrder = onUpgraded.mock.invocationCallOrder[0]
-    expect(retryCallOrder).toBeLessThan(upgradedCallOrder)
+    // onUpgraded should NOT have been called yet (waiting for auto-close)
+    expect(onUpgraded).not.toHaveBeenCalled()
+
+    // Fast-forward 2 seconds → dialog auto-closes
+    act(() => vi.advanceTimersByTime(2000))
+
+    await waitFor(() => expect(onUpgraded).toHaveBeenCalled())
+    vi.useRealTimers()
   })
 
   it('keeps the dialog open during import processing (shows spinner)', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
     // Make onRetryImport take some time
     let resolveImport: () => void
     const importPromise = new Promise<void>((resolve) => { resolveImport = resolve })
@@ -110,13 +116,23 @@ describe('CapacityUpgradeDialog — upgrade + import retry', () => {
     expect(onUpgraded).not.toHaveBeenCalled()
 
     // Resolve the import
-    resolveImport!()
+    act(() => { resolveImport!() })
 
-    // Now onUpgraded should be called
+    // Success state should appear
+    await waitFor(() => expect(screen.getByText('Upgrade & import complete')).toBeTruthy())
+
+    // Still not auto-closed
+    expect(onUpgraded).not.toHaveBeenCalled()
+
+    // Fast-forward 2 seconds → dialog auto-closes
+    act(() => vi.advanceTimersByTime(2000))
+
     await waitFor(() => expect(onUpgraded).toHaveBeenCalled())
+    vi.useRealTimers()
   })
 
   it('still closes the dialog if the import retry throws', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
     const onRetryImport = vi.fn(async () => {
       throw new Error('Network error during import')
     })
@@ -139,7 +155,13 @@ describe('CapacityUpgradeDialog — upgrade + import retry', () => {
     // onRetryImport was called
     await waitFor(() => expect(onRetryImport).toHaveBeenCalled())
 
-    // Dialog still closes even though import failed (tier is already upgraded)
+    // Success state still appears (tier is upgraded even if import failed)
+    await waitFor(() => expect(screen.getByText('Upgrade & import complete')).toBeTruthy())
+
+    // Fast-forward 2 seconds → dialog auto-closes
+    act(() => vi.advanceTimersByTime(2000))
+
     await waitFor(() => expect(onUpgraded).toHaveBeenCalled())
+    vi.useRealTimers()
   })
 })
