@@ -240,7 +240,7 @@ export function ParticipantsTab({ event, participants, registrationSettings, loc
           </motion.button>
           <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}
             onClick={() => setShowCsvModal(true)}
-            disabled={locked}
+            disabled={locked || importing}
             className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-[10px] font-bold transition-all border border-brand-divider text-brand-text-muted hover:bg-brand-surface-interactive disabled:opacity-40 disabled:cursor-not-allowed">
             {importing ? <Loader2 size={12} className="animate-spin" /> : <Upload size={12} />}
             {importing ? 'Importing...' : 'Import'}

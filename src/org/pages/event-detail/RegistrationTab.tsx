@@ -16,7 +16,8 @@ import { electionService } from '../../../services/election-service'
 import { billingService } from '../../../services/billing-service'
 import { API } from '../../../constants/api'
 import { getApiClient, unwrapPayload } from '../../../lib/api-client'
-import { eventService, type EventParticipantData, type EventVoterSummary } from '../../services/event-service'
+import { eventService, type EventParticipantData, type EventVoterSummary, type ImportPreviewResult } from '../../services/event-service'
+import ImportReviewModal from '../../components/ImportReviewModal'
 import { usePolling } from '../../../hooks/usePolling'
 import type { RegistrationSettings } from '../../../types/registration'
 import { resolveParticipantFields } from '../../../lib/participant-fields'
@@ -51,6 +52,9 @@ export function RegistrationTab({ event, registration, registrationSettings, par
   const [capacityUpgradeData, setCapacityUpgradeData] = useState<CapacityUpgradeData | null>(null)
   const [pendingImportParams, setPendingImportParams] = useState<{ mapping: Record<string, string>; records: Record<string, string>[] } | null>(null)
   const [pendingAddPayload, setPendingAddPayload] = useState<Record<string, string> | null>(null)
+  const [importPreview, setImportPreview] = useState<ImportPreviewResult | null>(null)
+  const [showImportReview, setShowImportReview] = useState(false)
+  const [importFileName, setImportFileName] = useState('import.csv')
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   const voterList = participants ?? []
@@ -165,10 +169,11 @@ export function RegistrationTab({ event, registration, registrationSettings, par
       }
       const csvFile = new File([csvLines.join('\n')], 'import.csv', { type: 'text/csv' })
 
-      const result = await eventService.importVoters(event.id, csvFile)
-
-      setImportResult({ success: result.successful, failed: result.failed })
-      onDataChanged?.()
+      // Go through the preview pipeline instead of direct import.
+      const preview = await eventService.previewImport(event.id, csvFile)
+      setImportPreview(preview)
+      setImportFileName('import.csv')
+      setShowImportReview(true)
     } catch (err) {
       const apiErr = err as Error & { code?: string | null; payload?: Record<string, unknown> }
       if (apiErr.code === 'VOTER_CAPACITY_EXCEEDED' && apiErr.payload) {
@@ -693,6 +698,22 @@ export function RegistrationTab({ event, registration, registrationSettings, par
           }
         }}
       />
+
+      {importPreview && (
+        <ImportReviewModal
+          open={showImportReview}
+          onClose={() => { setShowImportReview(false); setImportPreview(null) }}
+          onCommitted={(result) => {
+            setShowImportReview(false)
+            setImportPreview(null)
+            setImportResult({ success: result.successful, failed: result.failed })
+            onDataChanged?.()
+          }}
+          event={event}
+          preview={importPreview}
+          fileName={importFileName}
+        />
+      )}
 
       <DirectVoteModal
         open={showDirectVote}
