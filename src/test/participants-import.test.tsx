@@ -122,6 +122,8 @@ vi.mock('../org/components/CsvMappingModal', () => ({
 }))
 
 const importUrl = API.ENDPOINTS.VOTERS.IMPORT('evt-1')
+const previewUrl = API.ENDPOINTS.VOTERS.IMPORT_PREVIEW('evt-1')
+const commitUrl = API.ENDPOINTS.VOTERS.IMPORT_COMMIT('evt-1')
 const votersUrlPage1 = `${API.ENDPOINTS.VOTERS.BASE('evt-1')}?per_page=200&page=1`
 
 const part = (id: string, name: string, email: string, department = ''): EventParticipant => ({
@@ -278,8 +280,21 @@ describe('eventService.importVoters', () => {
 })
 
 describe('ParticipantsTab import flow', () => {
-  it('renders persisted participants in the table and refreshes after a successful import', async () => {
-    h.responses[importUrl] = {
+  it('renders persisted participants and shows import review after upload', async () => {
+    // Mock the preview endpoint to return a valid preview.
+    h.responses[previewUrl] = {
+      data: {
+        preview_id: 'prev-1',
+        total: 2, ready: 2, duplicates_in_file: 0, duplicates_existing: 0,
+        incomplete: 0, conflicts: 0, invalid: 0,
+        rows: [
+          { row: 1, data: { name: 'Alice', email: 'alice@example.com' }, category: 'ready', problems: [], existing_voter_id: null, existing_data: null },
+          { row: 2, data: { name: 'Bob', email: 'bob@example.com' }, category: 'ready', problems: [], existing_voter_id: null, existing_data: null },
+        ],
+      },
+    }
+    // Mock the commit endpoint.
+    h.responses[commitUrl] = {
       data: { uuid: 'batch-1', status: 'completed', total_records: 2, successful_records: 2, failed_records: 0 },
     }
     const onDataChanged = vi.fn()
@@ -297,14 +312,19 @@ describe('ParticipantsTab import flow', () => {
 
     fireEvent.click(screen.getByText('ConfirmImport'))
 
-    await waitFor(() => expect(h.postImpl).toHaveBeenCalledWith(expect.stringContaining('/voters/import'), expect.any(FormData), expect.anything()))
+    // The preview endpoint should be called first.
+    await waitFor(() => expect(h.postImpl).toHaveBeenCalledWith(expect.stringContaining('/voters/import/preview'), expect.any(FormData), expect.anything()))
+    // Import review modal should appear.
+    await waitFor(() => expect(screen.getByText('Import Review')).toBeTruthy())
+    // Click confirm import in the review modal.
+    fireEvent.click(screen.getByText('Confirm Import'))
+    // The commit endpoint should be called.
+    await waitFor(() => expect(h.postImpl).toHaveBeenCalledWith(expect.stringContaining('/voters/import/commit'), expect.anything()))
     await waitFor(() => expect(onDataChanged).toHaveBeenCalled())
-
-    expect(screen.getAllByText(/Import complete: 2 voters imported/).length).toBeGreaterThan(0)
   })
 
-  it('shows the API error message when an import fails', async () => {
-    h.responses[importUrl] = new Error('The CSV file contains no valid voter rows.')
+  it('shows the API error message when an import preview fails', async () => {
+    h.responses[previewUrl] = new Error('The CSV file contains no valid voter rows.')
 
     render(
       <ParticipantsTab

@@ -116,6 +116,8 @@ export const API = {
       BASE: (electionId: string) => `/elections/${electionId}/voters`,
       ADD: (electionId: string) => `/elections/${electionId}/voters`,
       IMPORT: (electionId: string) => `/elections/${electionId}/voters/import`,
+      IMPORT_PREVIEW: (electionId: string) => `/elections/${electionId}/voters/import/preview`,
+      IMPORT_COMMIT: (electionId: string) => `/elections/${electionId}/voters/import/commit`,
       CLEAR: (electionId: string) => `/elections/${electionId}/voters`,
     },
     VOTING: {

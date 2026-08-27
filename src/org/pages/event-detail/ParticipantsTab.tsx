@@ -13,7 +13,8 @@ import CsvMappingModal from '../../components/CsvMappingModal'
 import CapacityUpgradeDialog, { type CapacityUpgradeData } from '../../components/CapacityUpgradeDialog'
 import { API } from '../../../constants/api'
 import { getApiClient, unwrapPayload } from '../../../lib/api-client'
-import { eventService } from '../../services/event-service'
+import { eventService, type ImportPreviewResult } from '../../services/event-service'
+import ImportReviewModal from '../../components/ImportReviewModal'
 import { billingService } from '../../../services/billing-service'
 import { type OrivisEvent, type EventParticipant, PARTICIPANT_REG_STYLES, VERIFICATION_STYLES, PASS_STYLES } from './_shared'
 import { resolveParticipantFields, hasParticipantData, participantFieldValue } from '../../../lib/participant-fields'
@@ -55,6 +56,9 @@ export function ParticipantsTab({ event, participants, registrationSettings, loc
   const [capacityUpgradeData, setCapacityUpgradeData] = useState<CapacityUpgradeData | null>(null)
   const [pendingImportParams, setPendingImportParams] = useState<{ mapping: Record<string, string>; records: Record<string, string>[] } | null>(null)
   const [pendingAddPayload, setPendingAddPayload] = useState<Record<string, string> | null>(null)
+  const [importPreview, setImportPreview] = useState<ImportPreviewResult | null>(null)
+  const [showImportReview, setShowImportReview] = useState(false)
+  const [importFileName, setImportFileName] = useState('import.csv')
 
   // Handle payment return after capacity upgrade redirect.
   const PENDING_PAYMENT_KEY = 'orivis_pending_payment'
@@ -177,15 +181,11 @@ export function ParticipantsTab({ event, participants, registrationSettings, loc
       }
       const csvFile = new File([csvLines.join('\n')], 'import.csv', { type: 'text/csv' })
 
-      const result = await eventService.importVoters(event.id, csvFile)
-
-      setImportResult({ success: result.successful, failed: result.failed })
-      let message = `Import complete: ${result.successful} voter${result.successful !== 1 ? 's' : ''} imported`
-      if (result.failed > 0) {
-        message += `, ${result.failed} failed`
-      }
-      setToast({ message, type: 'success' })
-      onDataChanged?.()
+      // Go through the preview pipeline instead of direct import.
+      const preview = await eventService.previewImport(event.id, csvFile)
+      setImportPreview(preview)
+      setImportFileName('import.csv')
+      setShowImportReview(true)
     } catch (err) {
       const apiErr = err as Error & { code?: string | null; payload?: Record<string, unknown> }
       if (apiErr.code === 'VOTER_CAPACITY_EXCEEDED' && apiErr.payload) {
@@ -631,6 +631,25 @@ export function ParticipantsTab({ event, participants, registrationSettings, loc
           }
         }}
       />
+
+      {importPreview && (
+        <ImportReviewModal
+          open={showImportReview}
+          onClose={() => { setShowImportReview(false); setImportPreview(null) }}
+          onCommitted={(result) => {
+            setShowImportReview(false)
+            setImportPreview(null)
+            setImportResult({ success: result.successful, failed: result.failed })
+            let message = `Import complete: ${result.successful} participant${result.successful !== 1 ? 's' : ''} imported`
+            if (result.failed > 0) message += `, ${result.failed} failed`
+            setToast({ message, type: 'success' })
+            onDataChanged?.()
+          }}
+          event={event}
+          preview={importPreview}
+          fileName={importFileName}
+        />
+      )}
 
       <AnimatePresence>
         {showAddModal && (

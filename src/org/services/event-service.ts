@@ -66,6 +66,36 @@ export interface VoterImportResult {
   status: string
 }
 
+export interface ImportPreviewRow {
+  row: number
+  data: Record<string, string>
+  category: 'ready' | 'duplicate_in_file' | 'duplicate_existing' | 'incomplete' | 'conflict' | 'invalid'
+  problems: string[]
+  existing_voter_id: string | null
+  existing_data: Record<string, unknown> | null
+}
+
+export interface ImportPreviewResult {
+  preview_id: string
+  total: number
+  ready: number
+  duplicates_in_file: number
+  duplicates_existing: number
+  incomplete: number
+  conflicts: number
+  invalid: number
+  rows: ImportPreviewRow[]
+}
+
+export interface ImportCommitPayload {
+  preview_id: string
+  import_ready: boolean
+  import_duplicates_in_file?: boolean
+  import_duplicates_existing?: boolean
+  import_incomplete?: boolean
+  import_conflicts?: boolean
+}
+
 const VOTER_PAGE_SIZE = 200
 const MAX_VOTER_PAGES = 100
 
@@ -158,6 +188,35 @@ export const eventService = {
       failed,
       total,
       status: String(payload.status ?? ''),
+    }
+  },
+
+  async previewImport(eventId: string, file: File): Promise<ImportPreviewResult> {
+    const formData = new FormData()
+    formData.append('file', file)
+
+    const { data } = await getApiClient().post<unknown>(
+      API.ENDPOINTS.VOTERS.IMPORT_PREVIEW(eventId),
+      formData,
+      { headers: { 'Content-Type': undefined } },
+    )
+
+    return unwrapPayload<ImportPreviewResult>(data)
+  },
+
+  async commitImport(eventId: string, payload: ImportCommitPayload): Promise<VoterImportResult> {
+    const { data } = await getApiClient().post<unknown>(
+      API.ENDPOINTS.VOTERS.IMPORT_COMMIT(eventId),
+      payload,
+    )
+
+    const batch = unwrapPayload<Record<string, unknown>>(data)
+
+    return {
+      successful: Number(batch.successful_records ?? 0),
+      failed: Number(batch.failed_records ?? 0),
+      total: Number(batch.total_records ?? 0),
+      status: String(batch.status ?? ''),
     }
   },
 
