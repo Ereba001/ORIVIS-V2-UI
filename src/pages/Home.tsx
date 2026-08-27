@@ -272,13 +272,16 @@ export default function Home() {
           transition={{ duration: 0.8, delay: 0.4 }}
           className="relative aspect-[16/10] sm:aspect-[21/9] md:aspect-[2.5/1] w-full rounded-[20px] md:rounded-[32px] overflow-hidden shadow-2xl bg-brand-bg-secondary group"
         >
-          <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-30 flex gap-2">
+          <div className="absolute top-4 right-4 sm:top-6 sm:right-6 z-30 flex gap-1">
             {slides.map((_, idx) => (
-              <button
+              <div
                 key={idx}
+                role="button"
+                tabIndex={0}
                 onClick={() => { setActiveSlide(idx); setSlideImgFailed(false); }}
-                className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                  activeSlide === idx ? "w-6 bg-white" : "w-2 bg-white/30 hover:bg-white/60"
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { setActiveSlide(idx); setSlideImgFailed(false); } }}
+                className={`h-1 rounded-full transition-all duration-300 cursor-pointer ${
+                  activeSlide === idx ? "w-4 bg-white" : "w-1 bg-white/30 hover:bg-white/60"
                 }`}
                 aria-label={`Go to slide ${idx + 1}`}
               />
