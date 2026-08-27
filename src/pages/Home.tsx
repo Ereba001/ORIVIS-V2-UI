@@ -276,10 +276,11 @@ export default function Home() {
             {slides.map((_, idx) => (
               <div
                 key={idx}
-                role="button"
                 tabIndex={0}
+                role="img"
                 onClick={() => { setActiveSlide(idx); setSlideImgFailed(false); }}
                 onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { setActiveSlide(idx); setSlideImgFailed(false); } }}
+                style={{ minWidth: 0, minHeight: 0 }}
                 className={`h-1 rounded-full transition-all duration-300 cursor-pointer ${
                   activeSlide === idx ? "w-4 bg-white" : "w-1 bg-white/30 hover:bg-white/60"
                 }`}
