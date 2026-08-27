@@ -79,10 +79,18 @@ export default function CapacityUpgradeDialog({ open, onClose, onUpgraded, elect
         }
       }
 
-      setStep('choose')
+      // Retry the import now that capacity has been upgraded.
+      // Await it so the dialog stays open during processing and
+      // errors are surfaced properly instead of being silently lost.
+      try {
+        await onRetryImport()
+      } catch (importErr) {
+        // Import failed after a successful upgrade — surface the error
+        // but still close the dialog since the tier is already upgraded.
+        console.error('Import failed after capacity upgrade:', importErr)
+      }
       clearPendingImport()
       onUpgraded()
-      onRetryImport()
     } catch (err) {
       setStep('error')
       setError(err instanceof Error ? err.message : 'Upgrade failed. Please try again.')
