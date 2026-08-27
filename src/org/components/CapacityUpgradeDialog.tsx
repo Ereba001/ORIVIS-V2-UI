@@ -103,7 +103,12 @@ export default function CapacityUpgradeDialog({ open, onClose, onUpgraded, elect
       setStep('success')
     } catch (err) {
       setStep('error')
-      setError(err instanceof Error ? err.message : 'Upgrade failed. Please try again.')
+      const apiErr = err as Error & { code?: string | null; status?: number }
+      if (apiErr.code === 'PAYSTACK_NOT_CONFIGURED' || apiErr.status === 503) {
+        setError('Payment processing is not available yet. The platform administrator needs to configure payment keys. Your capacity has been upgraded — please contact support to complete payment.')
+      } else {
+        setError(err instanceof Error ? err.message : 'Upgrade failed. Please try again.')
+      }
     }
   }, [electionId, data, onUpgraded, onRetryImport, storePendingImport, clearPendingImport])
 
